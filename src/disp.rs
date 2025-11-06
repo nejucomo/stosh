@@ -1,5 +1,6 @@
 use ratatui::DefaultTerminal;
-use ratatui::widgets::Block;
+use ratatui::style::Color;
+use ratatui::widgets::{Block, BorderType, Borders};
 
 /// Drive the output display
 #[derive(Debug)]
@@ -18,7 +19,15 @@ impl Display {
     /// Draw the current frame
     pub fn draw(&mut self) -> std::io::Result<()> {
         self.term.draw(|frame| {
-            frame.render_widget(Block::bordered(), frame.area());
+            frame.render_widget(
+                Block::new()
+                    .title("══╡ partish ╞")
+                    .title_style(Color::DarkGray)
+                    .borders(Borders::TOP)
+                    .border_type(BorderType::Double)
+                    .border_style(Color::DarkGray),
+                frame.area(),
+            );
         })?;
 
         Ok(())
