@@ -4,6 +4,12 @@
 //!
 //! This is different from a "terminal multiplexer" because there is only a single shell, and in fact, the author uses `partish` inside of a terminal multiplexer.
 #![deny(unsafe_code, missing_docs)]
+mod disp;
+mod notification;
 mod run;
+mod ui;
 
+pub use self::disp::Display;
+pub use self::notification::Notification;
 pub use self::run::run;
+pub use self::ui::UI;
