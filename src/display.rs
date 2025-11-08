@@ -1,13 +1,14 @@
 use crossterm::event::Event;
 use ratatui::DefaultTerminal;
 
-use crate::{EventHandler, gadgets};
+use crate::EventHandler;
+use crate::gadgets::RootGadget;
 
 /// Drive the output display
 #[derive(Debug)]
 pub struct Display {
     term: DefaultTerminal,
-    mp: gadgets::MainPane,
+    root: RootGadget,
 }
 
 impl Display {
@@ -16,14 +17,14 @@ impl Display {
         let term = ratatui::init();
         Display {
             term,
-            mp: gadgets::MainPane::default(),
+            root: RootGadget::default(),
         }
     }
 
     /// Draw the current frame
     pub fn draw(&mut self) -> std::io::Result<()> {
         self.term
-            .draw(|frame| frame.render_widget(&self.mp, frame.area()))?;
+            .draw(|frame| frame.render_widget(&self.root, frame.area()))?;
         Ok(())
     }
 }
@@ -35,7 +36,7 @@ impl EventHandler for Display {
         match event {
             // FocusGained => todo!(),
             // FocusLost => todo!(),
-            Key(kev) => self.mp.handle_event(Key(kev)),
+            Key(kev) => self.root.handle_event(Key(kev)),
             // Mouse(mouse_event) => todo!(),
             // Paste(_) => todo!(),
             Resize(_, _) => {
