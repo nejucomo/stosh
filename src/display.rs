@@ -1,8 +1,8 @@
 use crossterm::event::Event;
 use ratatui::DefaultTerminal;
 
-use crate::EventHandler;
 use crate::gadgets::RootGadget;
+use crate::{EventHandler, UI};
 
 /// Drive the output display
 #[derive(Debug)]
@@ -13,11 +13,11 @@ pub struct Display {
 
 impl Display {
     /// Create a [Display]; this also activates the terminal as per [ratatui::init]
-    pub fn start() -> Self {
+    pub fn start(ui: UI) -> Self {
         let term = ratatui::init();
         Display {
             term,
-            root: RootGadget::default(),
+            root: RootGadget::new(ui),
         }
     }
 
@@ -30,6 +30,8 @@ impl Display {
 }
 
 impl EventHandler for Display {
+    type EventResult = ();
+
     fn handle_event(&mut self, event: Event) -> std::io::Result<()> {
         use Event::*;
 

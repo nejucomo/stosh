@@ -9,6 +9,7 @@ mod gadget;
 pub mod gadgets;
 mod handler;
 mod notification;
+mod rectext;
 mod run;
 mod ui;
 
@@ -16,5 +17,6 @@ pub use self::display::Display;
 pub use self::gadget::Gadget;
 pub use self::handler::EventHandler;
 pub use self::notification::Notification;
+pub use self::rectext::RectExt;
 pub use self::run::run;
 pub use self::ui::UI;

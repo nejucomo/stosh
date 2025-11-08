@@ -6,10 +6,9 @@ use crate::{Display, EventHandler as _, Notification, UI};
 
 /// Run the full interactive app, using the process arguments
 pub fn run() -> std::io::Result<()> {
-    let mut disp = Display::start();
-
     let (sender, recv) = mpsc::sync_channel(1024);
     let ui = UI::from(sender);
+    let mut disp = Display::start(ui.clone());
 
     // Read and notify console input events:
     ui.spawn(|ui| {

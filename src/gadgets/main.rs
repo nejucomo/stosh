@@ -54,6 +54,8 @@ impl WidgetRef for MainPane {
 }
 
 impl EventHandler for MainPane {
+    type EventResult = ();
+
     fn handle_event(&mut self, event: Event) -> std::io::Result<()> {
         Err(std::io::Error::other(format!("{event:#?}")))
     }
