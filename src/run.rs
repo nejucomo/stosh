@@ -2,13 +2,11 @@ use std::sync::mpsc;
 
 use crossterm::event;
 
-use crate::{Display, Notification, UI};
+use crate::{Display, EventHandler as _, Notification, UI};
 
 /// Run the full interactive app, using the process arguments
 pub fn run() -> std::io::Result<()> {
-    use Notification::*;
-
-    let mut disp = Display::new();
+    let mut disp = Display::start();
 
     let (sender, recv) = mpsc::sync_channel(1024);
     let ui = UI::from(sender);
@@ -23,15 +21,23 @@ pub fn run() -> std::io::Result<()> {
 
     disp.draw()?;
     for notif in std::iter::from_fn(|| recv.recv().ok()) {
+        use Notification::*;
+
         match notif {
+            Exit => {
+                return Ok(());
+            }
+
             ThreadError(error) => {
                 return Err(error);
             }
 
-            other => todo!("unhandled: {other:?}"),
+            CrosstermEvent(ev) => {
+                disp.handle_event(ev)?;
+            }
         }
 
-        // disp.draw()?;
+        disp.draw()?;
     }
 
     Ok(())
