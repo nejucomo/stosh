@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use crossterm::event::{Event, KeyCode};
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint, Rect};
@@ -32,13 +35,14 @@ impl ExitDialog {
 
     fn horizontal_constraint(&self) -> Constraint {
         Constraint::Length(
-            u16::try_from(self.text.width()).unwrap() + HORIZONTAL_PADDING + BLOCK_BORDER_SIZE,
+            u16::try_from(self.text.width()).unwrap()
+                + 2 * (HORIZONTAL_PADDING + BLOCK_BORDER_SIZE),
         )
     }
 
     fn vertical_constraint(&self) -> Constraint {
         Constraint::Length(
-            u16::try_from(self.text.height()).unwrap() + HORIZONTAL_PADDING + BLOCK_BORDER_SIZE,
+            u16::try_from(self.text.height()).unwrap() + 2 * (VERTICAL_PADDING + BLOCK_BORDER_SIZE),
         )
     }
 }

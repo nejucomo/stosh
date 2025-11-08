@@ -511,6 +511,7 @@ dependencies = [
  "clap",
  "crossterm 0.29.0",
  "derive_more",
+ "indoc",
  "portable-pty",
  "ratatui",
 ]

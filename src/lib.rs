@@ -20,3 +20,6 @@ pub use self::notification::Notification;
 pub use self::rectext::RectExt;
 pub use self::run::run;
 pub use self::ui::UI;
+
+#[cfg(test)]
+pub mod testutils;

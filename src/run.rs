@@ -1,13 +1,10 @@
-use std::sync::mpsc;
-
 use crossterm::event;
 
 use crate::{Display, EventHandler as _, Notification, UI};
 
 /// Run the full interactive app, using the process arguments
 pub fn run() -> std::io::Result<()> {
-    let (sender, recv) = mpsc::sync_channel(1024);
-    let ui = UI::from(sender);
+    let (ui, recv) = UI::create_channel();
     let mut disp = Display::start(ui.clone());
 
     // Read and notify console input events:

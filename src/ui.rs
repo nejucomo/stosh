@@ -10,6 +10,13 @@ use crate::Notification;
 pub struct UI(mpsc::SyncSender<Notification>);
 
 impl UI {
+    /// Initialize the [UI] notification channel
+    pub fn create_channel() -> (Self, mpsc::Receiver<Notification>) {
+        let (sender, recv) = mpsc::sync_channel(1024);
+        let ui = UI::from(sender);
+        (ui, recv)
+    }
+
     /// Spawn a thread which has its own [UI] handle and notify about any propagated errors
     pub fn spawn<F>(&self, f: F) -> JoinHandle<()>
     where
