@@ -1,0 +1,11 @@
+[package]
+name = "partish"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+clap = { workspace = true, features = ["derive"] }
+crossterm.workspace = true
+portable-pty.workspace = true
+ratatui.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "sync"] }
