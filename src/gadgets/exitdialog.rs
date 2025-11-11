@@ -2,60 +2,43 @@
 mod tests;
 
 use crossterm::event::{Event, KeyCode};
-use ratatui::buffer::Buffer;
-use ratatui::layout::{Constraint, Rect};
+use derive_new::new;
+use ratatui::layout::Constraint;
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Text;
-use ratatui::widgets::{Block, Clear, Padding, WidgetRef};
+use ratatui::widgets::{Block, Clear, Padding};
 
-use crate::{EventHandler, Gadget, Notification::Exit, RectExt as _, UI};
+use crate::{CenteredOverlay, ContextualWidget, RenderContext};
+use crate::{EventHandler, Gadget, Notification::Exit, UI};
 
 const BLOCK_BORDER_SIZE: u16 = 1;
 const HORIZONTAL_PADDING: u16 = 2;
 const VERTICAL_PADDING: u16 = 1;
 
 /// The exit dialog
-#[derive(Debug)]
-pub struct ExitDialog {
-    ui: UI,
-    block: Block<'static>,
-    text: Text<'static>,
-}
+#[derive(Debug, new)]
+pub struct ExitDialog(UI);
 
-impl ExitDialog {
-    /// Construct an exit dialog
-    pub fn new(ui: UI) -> Self {
-        ExitDialog {
-            ui,
-            block: Block::bordered()
-                .padding(Padding::symmetric(HORIZONTAL_PADDING, VERTICAL_PADDING)),
-            text: Text::styled("Exit? y/n", Style::new().bold().white().on_black()),
-        }
-    }
-
-    fn horizontal_constraint(&self) -> Constraint {
-        Constraint::Length(
-            u16::try_from(self.text.width()).unwrap()
-                + 2 * (HORIZONTAL_PADDING + BLOCK_BORDER_SIZE),
-        )
-    }
-
-    fn vertical_constraint(&self) -> Constraint {
-        Constraint::Length(
-            u16::try_from(self.text.height()).unwrap() + 2 * (VERTICAL_PADDING + BLOCK_BORDER_SIZE),
-        )
-    }
-}
+impl ExitDialog {}
 
 impl Gadget for ExitDialog {}
 
-impl WidgetRef for ExitDialog {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let area = area.centered_subrect(self.horizontal_constraint(), self.vertical_constraint());
+impl ContextualWidget for &ExitDialog {
+    fn render_to_context<'b>(self, ctx: &mut RenderContext<'b>) {
+        let text = Text::styled("Exit? y/n", Style::new().bold().white().on_black());
 
-        Clear.render_ref(area, buf);
-        self.block.render_ref(area, buf);
-        self.text.render_ref(self.block.inner(area), buf);
+        ctx.render(CenteredOverlay {
+            horizontal: Constraint::Length(
+                u16::try_from(text.width()).unwrap() + 2 * (HORIZONTAL_PADDING + BLOCK_BORDER_SIZE),
+            ),
+
+            vertical: Constraint::Length(
+                u16::try_from(text.height()).unwrap() + 2 * (VERTICAL_PADDING + BLOCK_BORDER_SIZE),
+            ),
+        })
+        .render(Clear)
+        .render(Block::bordered().padding(Padding::symmetric(HORIZONTAL_PADDING, VERTICAL_PADDING)))
+        .render(text);
     }
 }
 
@@ -69,7 +52,7 @@ impl EventHandler for ExitDialog {
         match event {
             // Notify exit, and keep dialog open
             Key(kev) if kev.code == KeyCode::Char('y') => {
-                self.ui.notify(Exit);
+                self.0.notify(Exit);
                 Ok(true)
             }
 

@@ -1,6 +1,8 @@
-use ratatui::widgets::WidgetRef;
-
-use crate::EventHandler;
+use crate::{ContextualWidget, EventHandler};
 
 /// A widget that handles events
-pub trait Gadget: WidgetRef + EventHandler {}
+pub trait Gadget: EventHandler
+where
+    for<'s> &'s Self: ContextualWidget,
+{
+}

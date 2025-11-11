@@ -2,11 +2,10 @@ use indoc::indoc;
 use ratatui::buffer::{Buffer, Cell};
 use ratatui::layout::Rect;
 use ratatui::style::{Style, Stylize as _};
-use ratatui::widgets::WidgetRef as _;
 
-use crate::UI;
 use crate::gadgets::ExitDialog;
 use crate::testutils::BufferExt as _;
+use crate::{ContextualWidget, RenderContext, UI};
 
 #[test]
 fn test_render() {
@@ -38,6 +37,6 @@ fn test_render() {
         area: expected.area,
         content: vec![Cell::default(); usize::try_from(expected.area.area()).unwrap()],
     };
-    ed.render_ref(expected.area, &mut actual);
+    ed.render_to_context(&mut RenderContext::new(expected.area, &mut actual));
     assert_eq!(expected, actual);
 }

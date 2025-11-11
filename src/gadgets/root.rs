@@ -1,40 +1,35 @@
 use crossterm::event::{Event, KeyCode};
-use ratatui::buffer::Buffer;
-use ratatui::layout::Rect;
-use ratatui::widgets::WidgetRef;
+use ratatui::widgets::Clear;
 
 use crate::gadgets::{ExitDialog, MainPane};
-use crate::{EventHandler, Gadget, UI};
+use crate::{ContextualWidget, EventHandler, Gadget, RenderContext, UI};
 
 /// The root [Gadget] encompassing all rendering and [Event] handling
 ///
 /// In addition to simply wrapping the [MainPane], this gadget supports the `ExitDialog`
 #[derive(Debug)]
 pub struct RootGadget {
+    ui: UI,
     mp: MainPane,
-    dialog: ExitDialog,
-    dialog_active: bool,
+    dialog: Option<ExitDialog>,
 }
 
 impl RootGadget {
     /// Construct with the [UI] notifier
     pub fn new(ui: UI) -> Self {
         Self {
-            mp: MainPane::new(ui.clone()),
-            dialog: ExitDialog::new(ui),
-            dialog_active: false,
+            ui: ui.clone(),
+            mp: MainPane::new(ui),
+            dialog: None,
         }
     }
 }
 
 impl Gadget for RootGadget {}
 
-impl WidgetRef for RootGadget {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        self.mp.render_ref(area, buf);
-        if self.dialog_active {
-            self.dialog.render_ref(area, buf);
-        }
+impl ContextualWidget for &RootGadget {
+    fn render_to_context<'b>(self, ctx: &mut RenderContext<'b>) {
+        ctx.render(Clear).render(&self.mp).render(&self.dialog);
     }
 }
 
@@ -44,11 +39,13 @@ impl EventHandler for RootGadget {
     fn handle_event(&mut self, event: Event) -> std::io::Result<()> {
         use Event::Key;
 
-        if self.dialog_active {
-            self.dialog_active = self.dialog.handle_event(event)?;
+        if let Some(dialog) = self.dialog.as_mut() {
+            if !dialog.handle_event(event)? {
+                self.dialog = None;
+            }
             Ok(())
         } else if matches!(event, Key(kev) if kev.code == KeyCode::Esc) {
-            self.dialog_active = true;
+            self.dialog = Some(ExitDialog::new(self.ui.clone()));
             Ok(())
         } else {
             self.mp.handle_event(event)

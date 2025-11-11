@@ -1,16 +1,13 @@
 use crossterm::event::Event;
-use ratatui::buffer::Buffer;
-use ratatui::layout::Rect;
 use ratatui::style::{Style, Stylize as _};
-use ratatui::widgets::{Block, BorderType, Borders, Clear, WidgetRef};
+use ratatui::widgets::{Block, BorderType, Borders};
 
 use crate::gadgets::CommandEntry;
-use crate::{EventHandler, Gadget, UI};
+use crate::{ContextualWidget, EventHandler, Gadget, RenderContext, UI};
 
 /// The main gadget for the whole UI
 #[derive(Debug)]
 pub struct MainPane {
-    block: Block<'static>,
     cmdentry: CommandEntry,
 }
 
@@ -18,12 +15,6 @@ impl MainPane {
     /// Construct with the [UI] notifier
     pub fn new(ui: UI) -> Self {
         Self {
-            block: Block::new()
-                .title("══╡ partish ╞")
-                .title_style(Style::new().dark_gray())
-                .borders(Borders::TOP)
-                .border_type(BorderType::Double)
-                .border_style(Style::new().dark_gray()),
             cmdentry: CommandEntry::new(ui),
         }
     }
@@ -31,11 +22,17 @@ impl MainPane {
 
 impl Gadget for MainPane {}
 
-impl WidgetRef for MainPane {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        Clear.render_ref(area, buf);
-        self.block.render_ref(area, buf);
-        self.cmdentry.render_ref(self.block.inner(area), buf);
+impl ContextualWidget for &MainPane {
+    fn render_to_context<'b>(self, ctx: &mut RenderContext<'b>) {
+        ctx.render(
+            Block::new()
+                .title("══╡ partish ╞")
+                .title_style(Style::new().dark_gray())
+                .borders(Borders::TOP)
+                .border_type(BorderType::Double)
+                .border_style(Style::new().dark_gray()),
+        )
+        .render(&self.cmdentry);
     }
 }
 

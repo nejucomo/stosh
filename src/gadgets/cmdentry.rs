@@ -1,9 +1,7 @@
 use crossterm::event::Event;
-use ratatui::buffer::Buffer;
-use ratatui::layout::Rect;
-use ratatui::widgets::WidgetRef;
+use ratatui::text::Text;
 
-use crate::{EventHandler, Gadget, UI};
+use crate::{ContextualWidget, EventHandler, Gadget, RenderContext, UI};
 
 /// The command entry gadget
 #[derive(Debug)]
@@ -21,10 +19,9 @@ impl CommandEntry {
 
 impl Gadget for CommandEntry {}
 
-impl WidgetRef for CommandEntry {
-    fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        let _ = (area, buf);
-        todo!()
+impl ContextualWidget for &CommandEntry {
+    fn render_to_context<'b>(self, ctx: &mut RenderContext<'b>) {
+        ctx.render(Text::raw("TODO: CommandEntry"));
     }
 }
 

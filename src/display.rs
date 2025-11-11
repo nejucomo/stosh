@@ -2,7 +2,7 @@ use crossterm::event::Event;
 use ratatui::DefaultTerminal;
 
 use crate::gadgets::RootGadget;
-use crate::{EventHandler, UI};
+use crate::{EventHandler, RenderContext, UI};
 
 /// Drive the output display
 #[derive(Debug)]
@@ -23,8 +23,9 @@ impl Display {
 
     /// Draw the current frame
     pub fn draw(&mut self) -> std::io::Result<()> {
-        self.term
-            .draw(|frame| frame.render_widget(&self.root, frame.area()))?;
+        self.term.draw(|frame| {
+            frame.render_widget(RenderContext::wrap_contextual(&self.root), frame.area())
+        })?;
         Ok(())
     }
 }
