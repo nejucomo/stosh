@@ -20,7 +20,7 @@ impl RootGadget {
     /// Construct with the [UI] notifier
     pub fn new(ui: UI) -> Self {
         Self {
-            mp: MainPane::default(),
+            mp: MainPane::new(ui.clone()),
             dialog: ExitDialog::new(ui),
             dialog_active: false,
         }
