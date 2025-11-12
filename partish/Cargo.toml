@@ -9,6 +9,6 @@ crossterm = { workspace = true, features = ["event-stream"] }
 futures.workspace = true
 portable-pty.workspace = true
 ratatui.workspace = true
-ratatui-rctx.workspace = true
+ratatui-rseq.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "time"] }
 tui-textarea.workspace = true

@@ -1,6 +1,6 @@
 use ratatui::{CompletedFrame, DefaultTerminal};
 
-use crate::{RenderContext, Renderable};
+use crate::Renderable;
 
 /// Provides [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) access to the terminal alternate screen; dropping causes a reset
 #[derive(Debug)]
@@ -18,7 +18,7 @@ impl TerminalSession {
         R: Renderable,
     {
         self.0
-            .draw(|frame| r.render_into(RenderContext::new(frame.area(), frame.buffer_mut())))
+            .draw(|frame| frame.render_widget(r.into_widget(), frame.area()))
     }
 }
 
