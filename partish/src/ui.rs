@@ -1,4 +1,5 @@
 use crossterm::event::{Event, KeyCode};
+use ratatui::layout::{Constraint, Flex};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, BorderType, Borders, Clear, Widget};
@@ -25,9 +26,18 @@ impl Renderable for &UI {
         )
             .then(&self.cmdinput)
             .then(if self.exitdialog {
+                let line = Line::from("Exit? y/n").bold().white().on_black();
+                let width = u16::try_from(line.width() + 2).unwrap();
+                let height = 3;
                 Some(
                     (Clear, Block::bordered().border_type(BorderType::Double))
-                        .then(Line::from("Exit? y/n").bold().white().on_black()),
+                        .then(line)
+                        .constrained(Constraint::Length(width))
+                        .on_left()
+                        .flex(Flex::Center)
+                        .constrained(Constraint::Length(height))
+                        .on_top()
+                        .flex(Flex::Center),
                 )
             } else {
                 None
