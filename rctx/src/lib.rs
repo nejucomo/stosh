@@ -1,14 +1,10 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! [RenderContext] and [Renderable] widgets for [ratatui]
+#![deny(unsafe_code, missing_docs)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod rctx;
+mod renderable;
+mod term;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use self::rctx::RenderContext;
+pub use self::renderable::Renderable;
+pub use self::term::TerminalSession;
