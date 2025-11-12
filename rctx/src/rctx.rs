@@ -20,15 +20,6 @@ impl<'b> RenderContext<'b> {
     {
         r.render_into(self);
     }
-
-    /// Render a [Widget] which is crate private to prevent "incomplete container" renders
-    #[allow(dead_code)]
-    pub(crate) fn render_widget<W>(&mut self, widget: W)
-    where
-        W: Widget,
-    {
-        widget.render(self.area, self.buf);
-    }
 }
 
 impl<'t> Renderable for ratatui::text::Text<'t> {
