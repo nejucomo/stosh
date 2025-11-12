@@ -2,7 +2,7 @@ use crossterm::event::{Event, KeyCode};
 use ratatui::layout::{Constraint, Flex};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
-use ratatui::widgets::{Block, BorderType, Borders, Clear, Widget};
+use ratatui::widgets::{Block, BorderType, Borders, Clear, Padding, Widget};
 use ratatui_rseq::{Renderable, RenderableSeq as _};
 
 use crate::cmdinput::CommandInput;
@@ -26,11 +26,17 @@ impl Renderable for &UI {
         )
             .then(&self.cmdinput)
             .then(if self.exitdialog {
-                let line = Line::from("Exit? y/n").bold().white().on_black();
-                let width = u16::try_from(line.width() + 2).unwrap();
-                let height = 3;
+                let line = Line::from("Exit? y/n").bold().white();
+                let width = u16::try_from(line.width() + 6).unwrap();
+                let height = 5;
                 Some(
-                    (Clear, Block::bordered().border_type(BorderType::Double))
+                    (
+                        Clear,
+                        Block::bordered()
+                            .border_type(BorderType::Double)
+                            .padding(Padding::symmetric(2, 1))
+                            .style(Style::reset().on_blue()),
+                    )
                         .then(line)
                         .constrained(Constraint::Length(width))
                         .on_left()
