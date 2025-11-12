@@ -20,10 +20,12 @@ impl<'b> RenderContext<'b> {
     {
         r.render_into(self);
     }
-}
 
-impl<'t> Renderable for ratatui::text::Text<'t> {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
-        self.render(rctx.area, rctx.buf);
+    /// Render into `self`
+    pub(crate) fn render_widget<W>(self, w: W)
+    where
+        W: Widget,
+    {
+        w.render(self.area, self.buf);
     }
 }
