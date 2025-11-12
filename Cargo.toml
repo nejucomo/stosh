@@ -8,10 +8,14 @@ members = [
 edition = "2024"
 
 [workspace.dependencies]
+ratatui-rctx = { path = "rctx" }
+
 clap = "4.5.51"
-crossterm = "0.29.0"
+crossterm = "0.28.1"
+futures = "0.3.31"
 derive-new = "0.7.0"
 derive_more = "2.0.1"
 portable-pty = "0.9.0"
 ratatui = "0.29.0"
 tokio = "1.48.0"
+tui-textarea = "0.7.0"

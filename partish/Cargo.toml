@@ -5,7 +5,10 @@ edition.workspace = true
 
 [dependencies]
 clap = { workspace = true, features = ["derive"] }
-crossterm.workspace = true
+crossterm = { workspace = true, features = ["event-stream"] }
+futures.workspace = true
 portable-pty.workspace = true
 ratatui.workspace = true
-tokio = { workspace = true, features = ["macros", "rt", "sync"] }
+ratatui-rctx.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "time"] }
+tui-textarea.workspace = true

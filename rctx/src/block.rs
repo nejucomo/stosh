@@ -1,4 +1,5 @@
 use derive_new::new;
+use ratatui::style::Style;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Widget as _};
 
@@ -38,6 +39,14 @@ where
     /// Define which borders to display similar to [Block::borders]
     pub fn borders(self, flag: Borders) -> Self {
         self.map_block(|b| b.borders(flag))
+    }
+
+    /// Define  border style similar to [Block::borders]
+    pub fn border_style<S>(self, style: S) -> Self
+    where
+        S: Into<Style>,
+    {
+        self.map_block(|b| b.border_style(style))
     }
 
     fn map_block<F>(self, f: F) -> Self
