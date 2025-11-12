@@ -1,4 +1,4 @@
-use crossterm::event::Event;
+use crossterm::event::{Event, KeyCode};
 use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
@@ -36,6 +36,18 @@ impl Handler<Event> for UI {
     type Response = std::io::Result<()>;
 
     async fn handle(&mut self, ev: Event) -> Self::Response {
-        Err(std::io::Error::other(format!("unhandled event: {ev:#?}")))
+        match ev {
+            Event::Key(kev) => {
+                if kev.code == KeyCode::Enter {
+                    Err(std::io::Error::other("not implemented: cmd input"))
+                } else {
+                    self.cmdinput.input(ev);
+                    Ok(())
+                }
+            }
+            other => Err(std::io::Error::other(format!(
+                "not implemented: {other:#?}"
+            ))),
+        }
     }
 }
