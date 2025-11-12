@@ -1,5 +1,5 @@
 [package]
-name = "ratatui-rctx"
+name = "ratatui-rseq"
 version = "0.1.0"
 edition.workspace = true
 

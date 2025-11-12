@@ -1,14 +1,14 @@
 [workspace]
 resolver = "3"
 members = [
-  "partish", "rctx",
+  "partish", "rseq",
 ]
 
 [workspace.package]
 edition = "2024"
 
 [workspace.dependencies]
-ratatui-rctx = { path = "rctx" }
+ratatui-rseq = { path = "rseq" }
 
 clap = "4.5.51"
 crossterm = "0.28.1"

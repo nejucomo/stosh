@@ -571,7 +571,7 @@ dependencies = [
  "futures",
  "portable-pty",
  "ratatui",
- "ratatui-rctx",
+ "ratatui-rseq",
  "tokio",
  "tui-textarea",
 ]
@@ -655,7 +655,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ratatui-rctx"
+name = "ratatui-rseq"
 version = "0.1.0"
 dependencies = [
  "derive-new",

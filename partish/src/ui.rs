@@ -2,7 +2,7 @@ use crossterm::event::Event;
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Clear, Widget};
-use ratatui_rctx::{Renderable, RenderableSeq as _};
+use ratatui_rseq::{Renderable, RenderableSeq as _};
 
 use crate::cmdinput::CommandInput;
 use crate::handler::Handler;

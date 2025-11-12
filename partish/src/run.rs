@@ -1,6 +1,6 @@
 use crossterm::event::EventStream;
 use futures::StreamExt as _;
-use ratatui_rctx::TerminalSession;
+use ratatui_rseq::TerminalSession;
 
 use crate::handler::Handler as _;
 use crate::ui::UI;

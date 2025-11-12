@@ -3,7 +3,7 @@ use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize};
 use ratatui::text::Line;
 use ratatui::widgets::Widget;
-use ratatui_rctx::Renderable;
+use ratatui_rseq::Renderable;
 use tui_textarea::TextArea;
 
 use crate::handler::Handler;
