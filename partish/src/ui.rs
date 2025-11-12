@@ -24,7 +24,7 @@ impl Renderable for &UI {
                 .borders(Borders::TOP)
                 .border_style(Style::new().green()),
         )
-            .then(&self.cmdinput)
+            .then(self.cmdinput.constrained(Constraint::Max(1)).on_top())
             .then(if self.exitdialog {
                 let line = Line::from("Exit? y/n").bold().white();
                 let width = u16::try_from(line.width() + 6).unwrap();
