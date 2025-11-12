@@ -603,6 +603,7 @@ name = "ratatui-rctx"
 version = "0.1.0"
 dependencies = [
  "derive-new",
+ "derive_more",
  "ratatui",
 ]
 

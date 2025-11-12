@@ -5,4 +5,5 @@ edition.workspace = true
 
 [dependencies]
 derive-new.workspace = true
+derive_more = { workspace = true, features = ["from"] }
 ratatui.workspace = true
