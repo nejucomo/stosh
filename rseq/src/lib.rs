@@ -5,6 +5,7 @@ pub mod layout;
 mod renderable;
 mod renderseq;
 mod term;
+mod widgets;
 
 pub use self::renderable::Renderable;
 pub use self::renderseq::{RenderableSeq, SeqRenderable};

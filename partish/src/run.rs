@@ -13,7 +13,9 @@ pub async fn run() -> std::io::Result<()> {
 
     term.draw(&ui)?;
     while let Some(event) = events.next().await.transpose()? {
-        ui.handle(event).await?;
+        if !ui.handle(event).await? {
+            break;
+        }
         term.draw(&ui)?;
     }
     Ok(())
