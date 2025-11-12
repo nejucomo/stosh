@@ -26,8 +26,7 @@ impl Renderable for &UI {
             .then(&self.cmdinput)
             .then(if self.exitdialog {
                 Some(
-                    Block::bordered()
-                        .border_type(BorderType::Double)
+                    (Clear, Block::bordered().border_type(BorderType::Double))
                         .then(Line::from("Exit? y/n").bold().white().on_black()),
                 )
             } else {
