@@ -1,9 +1,8 @@
 use crossterm::event::Event;
-use ratatui::layout::Constraint::{Fill, Max};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
-use ratatui::widgets::Borders;
-use ratatui_rctx::{RenderContext, Renderable};
+use ratatui::widgets::{Block, Borders, Clear, Widget};
+use ratatui_rctx::{Renderable, RenderableSeq as _};
 
 use crate::cmdinput::CommandInput;
 use crate::handler::Handler;
@@ -14,20 +13,17 @@ pub(crate) struct UI {
 }
 
 impl Renderable for &UI {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
-        self.cmdinput
-            .constrained(Max(1))
-            .on_top()
-            .followed_by(
-                ratatui::text::Text::default()
-                    .on_green()
-                    .constrained(Fill(1)),
-            )
-            .within_block()
-            .title_top(Line::from("partish").light_green().right_aligned())
-            .borders(Borders::TOP)
-            .border_style(Style::new().green())
-            .render_into(rctx);
+    fn into_widget(self) -> impl Widget {
+        (
+            Clear,
+            Style::reset().gray().on_black(),
+            Block::new()
+                .title_top(Line::from("partish").light_green().right_aligned())
+                .borders(Borders::TOP)
+                .border_style(Style::new().green()),
+        )
+            .then(&self.cmdinput)
+            .into_widget()
     }
 }
 

@@ -1,8 +1,10 @@
 //! Layout builders
 use derive_new::new;
-use ratatui::layout::{Constraint, Direction, Flex, Layout, Spacing};
+use ratatui::buffer::Buffer;
+use ratatui::layout::{Constraint, Direction, Flex, Layout, Rect, Spacing};
+use ratatui::widgets::Widget;
 
-use crate::{RenderContext, Renderable};
+use crate::Renderable;
 
 /// A constraint-associated renderable
 #[derive(Debug, new)]
@@ -122,11 +124,20 @@ where
     A: Renderable,
     B: Renderable,
 {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
+    fn into_widget(self) -> impl Widget {
+        self
+    }
+}
+
+impl<A, B> Widget for LayoutPair<A, B>
+where
+    A: Renderable,
+    B: Renderable,
+{
+    fn render(self, area: Rect, buf: &mut Buffer) {
         let LayoutPair { layout, a, b } = self;
-        let RenderContext { area, buf } = rctx;
         let [area_a, area_b] = layout.areas(area);
-        RenderContext::new(area_a, buf).render(a.r);
-        RenderContext::new(area_b, buf).render(b.r);
+        a.r.into_widget().render(area_a, buf);
+        b.r.into_widget().render(area_b, buf);
     }
 }

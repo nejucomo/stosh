@@ -2,7 +2,8 @@ use crossterm::event::{Event, KeyCode};
 use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize};
 use ratatui::text::Line;
-use ratatui_rctx::{RenderContext, Renderable};
+use ratatui::widgets::Widget;
+use ratatui_rctx::Renderable;
 use tui_textarea::TextArea;
 
 use crate::handler::Handler;
@@ -24,7 +25,7 @@ impl Default for CommandInput {
 }
 
 impl Renderable for &CommandInput {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
+    fn into_widget(self) -> impl Widget {
         let prompt = Line::from("⟨0⟩".black().on_light_cyan());
         let pwidth = prompt.width().try_into().unwrap();
 
@@ -34,7 +35,6 @@ impl Renderable for &CommandInput {
             .followed_by(self.ta.constrained(Fill(1)))
             .horizontal_margin(1)
             .spacing(1)
-            .render_into(rctx);
     }
 }
 

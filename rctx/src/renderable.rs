@@ -1,16 +1,12 @@
 use ratatui::layout::Constraint;
+use ratatui::widgets::Widget;
 
-use crate::{FilledBlock, RenderContext, layout};
+use crate::layout;
 
-/// Similar to [ratatui::widgets::Widget]
+/// A [Renderable] can convert to a [Widget] and provies composition methods
 pub trait Renderable: Sized {
-    /// Render into `rctx`
-    fn render_into<'b>(self, rctx: RenderContext<'b>);
-
-    /// Place `self` visually inside a [FilledBlock]
-    fn within_block<'b>(self) -> FilledBlock<'b, Self> {
-        FilledBlock::new(self)
-    }
+    /// Convert into a [Widget]
+    fn into_widget(self) -> impl Widget;
 
     /// Constrain `self` for layout within a container
     fn constrained(self, constraint: Constraint) -> layout::Constrained<Self> {
@@ -18,20 +14,21 @@ pub trait Renderable: Sized {
     }
 }
 
+// Only a subset of widgets are directly [Renderable]:
 impl<'a> Renderable for ratatui::text::Line<'a> {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
-        rctx.render_widget(self);
+    fn into_widget(self) -> impl Widget {
+        self
     }
 }
 
 impl<'a> Renderable for ratatui::text::Text<'a> {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
-        rctx.render_widget(self);
+    fn into_widget(self) -> impl Widget {
+        self
     }
 }
 
 impl<'a> Renderable for &tui_textarea::TextArea<'a> {
-    fn render_into<'b>(self, rctx: RenderContext<'b>) {
-        rctx.render_widget(self);
+    fn into_widget(self) -> impl Widget {
+        self
     }
 }
