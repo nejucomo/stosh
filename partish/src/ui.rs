@@ -1,4 +1,5 @@
 use crossterm::event::Event;
+use ratatui::layout::Constraint::{Fill, Max};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
 use ratatui::widgets::Borders;
@@ -15,6 +16,13 @@ pub(crate) struct UI {
 impl Renderable for &UI {
     fn render_into<'b>(self, rctx: RenderContext<'b>) {
         self.cmdinput
+            .constrained(Max(1))
+            .on_top()
+            .followed_by(
+                ratatui::text::Text::default()
+                    .on_green()
+                    .constrained(Fill(1)),
+            )
             .within_block()
             .title_top(Line::from("partish").light_green().right_aligned())
             .borders(Borders::TOP)

@@ -17,7 +17,7 @@ impl Default for CommandInput {
         let mut ta = TextArea::default();
         ta.set_cursor_style(Style::reset().on_light_cyan());
         ta.set_cursor_line_style(Style::default());
-        ta.set_style(Style::reset().gray().on_black());
+        ta.set_style(Style::reset().gray().on_dark_gray());
 
         Self { ta }
     }
@@ -25,15 +25,15 @@ impl Default for CommandInput {
 
 impl Renderable for &CommandInput {
     fn render_into<'b>(self, rctx: RenderContext<'b>) {
-        let mut prompt = Line::default();
-        prompt.push_span("⟨0⟩".black().on_light_cyan());
-        prompt.push_span(" ".black().on_black());
+        let prompt = Line::from("⟨0⟩".black().on_light_cyan());
         let pwidth = prompt.width().try_into().unwrap();
 
         prompt
             .constrained(Length(pwidth))
             .on_left()
             .followed_by(self.ta.constrained(Fill(1)))
+            .horizontal_margin(1)
+            .spacing(1)
             .render_into(rctx);
     }
 }
