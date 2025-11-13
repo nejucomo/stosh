@@ -74,15 +74,29 @@ impl Handler<Event> for CommandInput {
                 modifiers,
                 ..
             }) => {
-                if modifiers.is_empty() {
-                    Ok(Some(self.pop_text()))
+                let mut send_cmd = if modifiers.is_empty() {
+                    true
                 } else if modifiers == KeyModifiers::CONTROL {
-                    self.ta.insert_newline();
-                    Ok(None)
+                    false
                 } else {
-                    Ok(None)
+                    // We ignore any other modifiers on return
+                    return Ok(None);
+                };
+
+                if self.height() > 1 {
+                    // When we're already in multi-line mode, we invert the CONTROL meaning
+                    send_cmd = !send_cmd;
                 }
+
+                Ok(if send_cmd {
+                    Some(self.pop_text())
+                } else {
+                    self.ta.insert_newline();
+                    None
+                })
             }
+
+            // Forward all other events to `self.ta`:
             ev => {
                 self.ta.input(ev);
                 Ok(None)
