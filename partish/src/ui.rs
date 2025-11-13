@@ -2,38 +2,28 @@ use crossterm::event::{Event, KeyCode};
 use ratatui::layout::{Constraint, Flex};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
-use ratatui::widgets::{Block, BorderType, Borders, Clear, Padding, Widget};
+use ratatui::widgets::{Block, BorderType, Clear, Padding, Widget};
 use ratatui_rseq::{Renderable, RenderableSeq as _};
 
-use crate::cmdinput::CommandInput;
 use crate::handler::Handler;
+use crate::mainscreen::MainScreen;
 use crate::u16util::IntoU16 as _;
 
 #[derive(Debug, Default)]
 pub(crate) struct UI {
-    cmdinput: CommandInput,
+    ms: MainScreen,
     exitdialog: bool,
 }
 
 impl Renderable for &UI {
     fn into_widget(self) -> impl Widget {
-        (
-            Clear,
-            Style::reset().gray().on_black(),
-            Block::new()
-                .title_top(Line::from("partish").light_green().right_aligned())
-                .borders(Borders::TOP)
-                .border_style(Style::new().green()),
-        )
-            .then(
-                self.cmdinput
-                    .constrained(Constraint::Length(self.cmdinput.height().into_u16()))
-                    .on_top(),
-            )
+        (Clear, Style::reset().gray().on_black())
+            .then(&self.ms)
             .then(if self.exitdialog {
                 let line = Line::from("Exit? y/n").bold().white();
                 let width = (line.width() + 6).into_u16();
                 let height = 5;
+
                 Some(
                     (
                         Clear,
@@ -75,10 +65,8 @@ impl Handler<Event> for UI {
         } else if matches!(ev, Event::Key(kev) if kev.code == KeyCode::Esc) {
             self.exitdialog = true;
             Ok(true)
-        } else if let Some(cmd) = self.cmdinput.handle(ev).await? {
-            Err(std::io::Error::other(format!("handle cmd: {cmd:?}")))
         } else {
-            Ok(true)
+            self.ms.handle(ev).await
         }
     }
 }

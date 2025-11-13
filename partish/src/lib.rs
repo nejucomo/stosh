@@ -6,6 +6,7 @@
 #![deny(unsafe_code, missing_docs)]
 mod cmdinput;
 mod handler;
+mod mainscreen;
 mod run;
 mod u16util;
 mod ui;
