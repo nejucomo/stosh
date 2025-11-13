@@ -7,6 +7,7 @@
 mod cmdinput;
 mod handler;
 mod run;
+mod u16util;
 mod ui;
 
 pub use self::run::run;

@@ -1,3 +1,7 @@
+use ratatui::crossterm::ExecutableCommand as _;
+use ratatui::crossterm::event::{
+    KeyboardEnhancementFlags, PopKeyboardEnhancementFlags, PushKeyboardEnhancementFlags,
+};
 use ratatui::{CompletedFrame, DefaultTerminal};
 
 use crate::Renderable;
@@ -8,8 +12,13 @@ pub struct TerminalSession(DefaultTerminal);
 
 impl TerminalSession {
     /// This initializes the session
-    pub fn start() -> Self {
-        TerminalSession(ratatui::init())
+    pub fn start() -> std::io::Result<Self> {
+        let me = TerminalSession(ratatui::init());
+        std::io::stdout().execute(PushKeyboardEnhancementFlags(
+            KeyboardEnhancementFlags::REPORT_EVENT_TYPES,
+        ))?;
+
+        Ok(me)
     }
 
     /// Draw onto a terminal
@@ -24,6 +33,9 @@ impl TerminalSession {
 
 impl Drop for TerminalSession {
     fn drop(&mut self) {
+        std::io::stdout()
+            .execute(PopKeyboardEnhancementFlags)
+            .unwrap();
         ratatui::restore();
     }
 }
