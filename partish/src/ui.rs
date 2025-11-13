@@ -7,6 +7,7 @@ use ratatui_rseq::{Renderable, RenderableSeq as _};
 
 use crate::cmdinput::CommandInput;
 use crate::handler::Handler;
+use crate::u16util::IntoU16 as _;
 
 #[derive(Debug, Default)]
 pub(crate) struct UI {
@@ -24,10 +25,14 @@ impl Renderable for &UI {
                 .borders(Borders::TOP)
                 .border_style(Style::new().green()),
         )
-            .then(self.cmdinput.constrained(Constraint::Max(1)).on_top())
+            .then(
+                self.cmdinput
+                    .constrained(Constraint::Length(self.cmdinput.height().into_u16()))
+                    .on_top(),
+            )
             .then(if self.exitdialog {
                 let line = Line::from("Exit? y/n").bold().white();
-                let width = u16::try_from(line.width() + 6).unwrap();
+                let width = (line.width() + 6).into_u16();
                 let height = 5;
                 Some(
                     (
@@ -70,8 +75,9 @@ impl Handler<Event> for UI {
         } else if matches!(ev, Event::Key(kev) if kev.code == KeyCode::Esc) {
             self.exitdialog = true;
             Ok(true)
+        } else if let Some(cmd) = self.cmdinput.handle(ev).await? {
+            Err(std::io::Error::other(format!("handle cmd: {cmd:?}")))
         } else {
-            self.cmdinput.handle(ev).await?;
             Ok(true)
         }
     }

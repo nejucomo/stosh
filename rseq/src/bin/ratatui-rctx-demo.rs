@@ -5,7 +5,7 @@ use ratatui::widgets::Block;
 use ratatui_rseq::{RenderableSeq as _, TerminalSession};
 
 fn main() -> std::io::Result<()> {
-    let mut term = TerminalSession::start();
+    let mut term = TerminalSession::start()?;
     term.draw(
         Block::bordered()
             .title_top(Line::from("rseq demo".blue().on_white()).alignment(Center))
