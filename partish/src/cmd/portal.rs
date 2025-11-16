@@ -18,17 +18,12 @@ pub(crate) struct Portal {
 
 impl Portal {
     pub(crate) fn new(histix: usize, mut input: cmd::TextArea) -> Self {
-        input.reset_style();
-        input.set_style(Style::default().blue().on_dark_gray());
-
-        let mut output = cmd::TextArea::default();
-        output.reset_style();
-        output.set_style(Style::reset().blue().on_black());
+        let ds = Style::default();
 
         Portal {
             histix,
-            input,
-            output,
+            input: input.reset_style().set_style(ds.gray().on_dark_gray()),
+            output: cmd::TextArea::default().set_style(ds.blue().on_black()),
         }
     }
 

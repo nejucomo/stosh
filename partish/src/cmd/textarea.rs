@@ -11,7 +11,7 @@ use crate::handler::Handler;
 
 type Inner = tui_textarea::TextArea<'static>;
 
-#[derive(Default, Dbg, Deref, DerefMut)]
+#[derive(Dbg, Deref, DerefMut)]
 pub(crate) struct TextArea(#[dbg(formatter = "fmt_text_area")] Inner);
 
 fn fmt_text_area(ta: &Inner) -> String {
@@ -19,15 +19,38 @@ fn fmt_text_area(ta: &Inner) -> String {
 }
 
 impl TextArea {
+    pub(crate) fn reset_style(mut self) -> Self {
+        let s = Style::default();
+
+        self.set_cursor_style(s)
+            .set_cursor_line_style(s)
+            .set_style(s)
+    }
+
+    pub(crate) fn set_style(mut self, style: Style) -> Self {
+        self.0.set_style(style);
+        self
+    }
+
+    pub(crate) fn set_cursor_style(mut self, style: Style) -> Self {
+        self.0.set_cursor_style(style);
+        self
+    }
+
+    pub(crate) fn set_cursor_line_style(mut self, style: Style) -> Self {
+        self.0.set_cursor_line_style(style);
+        self
+    }
+
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
         self.0.lines().len()
     }
+}
 
-    pub(crate) fn reset_style(&mut self) {
-        self.0.set_cursor_style(Style::default());
-        self.0.set_cursor_line_style(Style::default());
-        self.0.set_style(Style::default());
+impl Default for TextArea {
+    fn default() -> Self {
+        TextArea(Inner::default()).reset_style()
     }
 }
 

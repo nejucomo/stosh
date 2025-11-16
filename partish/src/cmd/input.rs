@@ -22,22 +22,16 @@ impl Input {
     pub(crate) fn height(&self) -> usize {
         self.ta.height()
     }
-
-    fn reset_style(&mut self) {
-        self.ta.reset_style();
-        self.ta.set_cursor_style(Style::default().on_light_cyan());
-        self.ta.set_style(Style::default().gray().on_dark_gray());
-    }
 }
 
 impl Default for Input {
     fn default() -> Self {
-        let mut me = Input {
-            ta: TextArea::default(),
+        Input {
+            ta: TextArea::default()
+                .set_cursor_style(Style::default().on_light_cyan())
+                .set_style(Style::default().gray().on_dark_gray()),
             histix: 0,
-        };
-        me.reset_style();
-        me
+        }
     }
 }
 
@@ -80,10 +74,9 @@ impl Handler<Event> for Input {
                 }
 
                 Ok(if send_cmd {
-                    let resp = (self.histix, std::mem::take(&mut self.ta));
-                    self.histix += 1;
-                    self.reset_style();
-                    Some(resp)
+                    let Input { histix, ta } = std::mem::take(self);
+                    self.histix = histix + 1;
+                    Some((histix, ta))
                 } else {
                     self.ta.insert_newline();
                     None
