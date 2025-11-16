@@ -5,6 +5,8 @@ use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
 use crate::cmd;
+use crate::rectext::RectExt as _;
+use crate::u16util::IntoU16 as _;
 
 #[derive(Debug, Default)]
 pub(crate) struct Stack {
@@ -29,12 +31,29 @@ impl Renderable for &Stack {
 }
 
 impl Widget for &Stack {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let areas =
-            Layout::vertical(std::iter::repeat_n(Ratio(1, 3), self.portals.len())).split(area);
+    #[tracing::instrument(skip(buf))]
+    fn render(self, mut area: Rect, buf: &mut Buffer) {
+        let ratio = (1, 3);
 
-        for (i, portal) in self.portals.iter().rev().enumerate() {
-            portal.into_widget().render(areas[i], buf);
+        for portal in self.portals.iter().rev() {
+            if area.height == 0 {
+                break;
+            }
+
+            let clipheight = area.height * ratio.1 / ratio.0;
+            let clipheight = if clipheight == 0 {
+                // Consume the remainder:
+                area.height
+            } else {
+                clipheight
+            };
+
+            let splitheight = std::cmp::min(portal.height().into_u16(), clipheight);
+            let (subarea, remaining) = area.split_vertically(splitheight);
+            tracing::debug!(?area.height, ?subarea.height, ?remaining.height);
+
+            portal.into_widget().render(subarea, buf);
+            area = remaining;
         }
     }
 }

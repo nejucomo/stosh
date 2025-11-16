@@ -20,7 +20,7 @@ impl Portal {
     pub(crate) fn new(histix: usize, mut input: cmd::TextArea) -> Self {
         let ds = Style::default();
         let mut output = cmd::TextArea::default().set_style(ds.blue().on_black());
-        output.insert_str("example\noutput\n is multiple lines");
+        output.insert_str("hello\nworld\nhere\nis\nsome\ntext\nover\nlines");
 
         Portal {
             histix,
@@ -29,9 +29,9 @@ impl Portal {
         }
     }
 
-    // pub(crate) fn height(&self) -> usize {
-    //     self.input.height() + 1
-    // }
+    pub(crate) fn height(&self) -> usize {
+        self.input.height() + self.output.height()
+    }
 }
 
 impl Renderable for &Portal {

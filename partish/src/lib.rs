@@ -11,6 +11,7 @@ mod handler;
 mod log;
 mod mainscreen;
 mod prompt;
+mod rectext;
 mod run;
 mod u16util;
 mod ui;
