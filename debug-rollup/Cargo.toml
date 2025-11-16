@@ -1,0 +1,9 @@
+[package]
+name = "debug-rollup"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+debug-concise.workspace = true
+ratatui.workspace = true
+type-name-concise.workspace = true

@@ -1,0 +1,9 @@
+[package]
+name = "debug-concise"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+derive_more = { workspace = true, features = ["from", "deref", "deref_mut"] }
+derive-new.workspace = true
+type-name-concise.workspace = true

@@ -5,7 +5,7 @@ use crate::Renderable;
 use crate::layout::Planner;
 
 /// A constraint-associated renderable
-#[derive(Debug, new)]
+#[derive(new)]
 pub struct Constrained<R>
 where
     R: Renderable,
@@ -26,5 +26,16 @@ where
     /// Place `self` to the left of another widget
     pub fn on_top(self, loglabel: &'static str) -> Planner<Layout, R> {
         Planner::new_direction(loglabel, Direction::Vertical, self)
+    }
+}
+
+impl<R> std::fmt::Debug for Constrained<R>
+where
+    R: Renderable,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple(&format!("Constrained<{}>", self.constraint))
+            .field(&self.r)
+            .finish()
     }
 }

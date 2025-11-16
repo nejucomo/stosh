@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use debug_rollup::DebugRollup;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::widgets::Widget;
@@ -7,7 +8,7 @@ use ratatui::widgets::Widget;
 use crate::Renderable;
 use crate::layout::{Constrained, Planner};
 
-pub trait Precedent: std::fmt::Debug {
+pub trait Precedent: DebugRollup {
     fn map_layout<F>(self, f: F) -> Self
     where
         F: FnOnce(Layout) -> Layout;
@@ -19,8 +20,6 @@ pub trait Precedent: std::fmt::Debug {
         area: Rect,
         buf: &mut Buffer,
     ) -> Rc<[Rect]>;
-
-    fn dyn_debugs(&self) -> Vec<&dyn std::fmt::Debug>;
 }
 
 impl Precedent for Layout {
@@ -51,10 +50,6 @@ impl Precedent for Layout {
             );
         }
         areas
-    }
-
-    fn dyn_debugs(&self) -> Vec<&dyn std::fmt::Debug> {
-        vec![]
     }
 }
 
@@ -110,10 +105,16 @@ where
         }
         areas
     }
+}
 
-    fn dyn_debugs(&self) -> Vec<&dyn std::fmt::Debug> {
+impl<P, S> DebugRollup for Planner<P, S>
+where
+    P: Precedent,
+    S: Renderable,
+{
+    fn dyn_debugs(&self) -> Vec<Box<dyn std::fmt::Debug + '_>> {
         let mut v = self.precedent.dyn_debugs();
-        v.push(&self.subsequent);
+        v.push(Box::new(&self.subsequent));
         v
     }
 }

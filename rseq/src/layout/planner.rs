@@ -1,8 +1,7 @@
 #[path = "precedent.rs"]
 mod sealed;
 
-use std::fmt::Debug;
-
+use debug_rollup::delegate_debug_to_rollup;
 use derive_new::new;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint, Direction, Flex, Layout, Rect, Spacing};
@@ -24,6 +23,13 @@ where
     precedent: P,
     subsequent: Constrained<S>,
 }
+
+delegate_debug_to_rollup!(
+    Planner<P, S>
+    where
+        P: sealed::Precedent,
+        S: Renderable,
+);
 
 impl<S> Planner<Layout, S>
 where
@@ -104,19 +110,5 @@ where
             tracing::warn!(?loglabel, "empty area detected");
         }
         self.render_plan(loglabel, vec![], area, buf);
-    }
-}
-
-impl<P, S> Debug for Planner<P, S>
-where
-    P: sealed::Precedent,
-    S: Renderable,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut dt = f.debug_tuple("Planner<ish>");
-        for c in self.dyn_debugs() {
-            dt.field(c);
-        }
-        dt.finish()
     }
 }
