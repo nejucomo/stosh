@@ -7,9 +7,14 @@ edition.workspace = true
 clap = { workspace = true, features = ["derive"] }
 crossterm = { workspace = true, features = ["event-stream"] }
 derive-new.workspace = true
+derive_more = { workspace = true, features = ["as_ref", "deref"] }
+dirs.workspace = true
 futures.workspace = true
 portable-pty.workspace = true
-ratatui.workspace = true
 ratatui-rseq.workspace = true
+ratatui.workspace = true
+time = { workspace = true, features = ["formatting", "local-offset"] }
 tokio = { workspace = true, features = ["macros", "rt", "time"] }
+tracing-subscriber.workspace = true
+tracing.workspace = true
 tui-textarea.workspace = true
