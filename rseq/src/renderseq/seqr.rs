@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use derive_new::new;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;

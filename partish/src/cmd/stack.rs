@@ -1,5 +1,6 @@
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint::Ratio, Layout, Rect};
+use ratatui::style::{Style, Stylize as _};
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
@@ -25,6 +26,8 @@ impl Renderable for &Stack {
 
 impl Widget for &Stack {
     fn render(self, area: Rect, buf: &mut Buffer) {
+        buf.set_style(area, Style::reset().cyan().on_green());
+
         let areas =
             Layout::vertical(std::iter::repeat_n(Ratio(1, 3), self.portals.len())).split(area);
 

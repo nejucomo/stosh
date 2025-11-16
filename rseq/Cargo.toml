@@ -7,4 +7,5 @@ edition.workspace = true
 derive-new.workspace = true
 derive_more = { workspace = true, features = ["from"] }
 ratatui.workspace = true
+tracing.workspace = true
 tui-textarea.workspace = true

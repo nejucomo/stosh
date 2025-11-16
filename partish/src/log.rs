@@ -1,9 +1,23 @@
 use std::fmt::Display;
+use std::fs::File;
 use std::path::PathBuf;
 use std::str::FromStr;
 
 use derive_more::{AsRef, Deref};
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
+use tracing::Level;
+
+pub fn init(path: LogPath) -> std::io::Result<()> {
+    let log = File::create(path)?;
+    tracing_subscriber::fmt()
+        .with_writer(log)
+        .pretty()
+        .with_max_level(Level::DEBUG)
+        .with_target(false)
+        .init();
+    tracing::debug!("initialized log");
+    Ok(())
+}
 
 /// A [PathBuf] newtype with a sensible default for our logfile
 #[derive(Clone, Debug, Deref, AsRef)]

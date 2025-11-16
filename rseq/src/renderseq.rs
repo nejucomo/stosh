@@ -2,6 +2,8 @@ mod seqr;
 
 pub use self::seqr::SeqRenderable;
 
+use std::fmt::Debug;
+
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::widgets::Widget;
@@ -11,7 +13,7 @@ use crate::Renderable;
 /// These are "builder" types which produce a [Renderable] with [RenderableSeq::then]
 ///
 /// The impls are often containers or other building blocks for rendering.
-pub trait RenderableSeq: Sized {
+pub trait RenderableSeq: Sized + Debug {
     /// The impls handle special rendering here, returning a new context
     fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect;
 

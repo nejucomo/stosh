@@ -1,6 +1,8 @@
 #[path = "precedent.rs"]
 mod sealed;
 
+use std::fmt::Debug;
+
 use derive_new::new;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint, Direction, Flex, Layout, Rect, Spacing};
@@ -11,13 +13,14 @@ use crate::layout::Constrained;
 use crate::layout::planner::sealed::Precedent as _;
 
 /// A one-dimensional layout planner
-#[derive(Debug, new)]
+#[derive(new)]
 #[new(visibility = "")]
 pub struct Planner<P, S>
 where
     P: sealed::Precedent,
     S: Renderable,
 {
+    loglabel: &'static str,
     precedent: P,
     subsequent: Constrained<S>,
 }
@@ -26,10 +29,14 @@ impl<S> Planner<Layout, S>
 where
     S: Renderable,
 {
-    pub(super) fn new_direction(d: Direction, subsequent: Constrained<S>) -> Self {
+    pub(super) fn new_direction(
+        loglabel: &'static str,
+        d: Direction,
+        subsequent: Constrained<S>,
+    ) -> Self {
         let c: [Constraint; 0] = [];
         let layout = Layout::new(d, c);
-        Planner::new(layout, subsequent)
+        Planner::new(loglabel, layout, subsequent)
     }
 }
 
@@ -39,11 +46,11 @@ where
     S: Renderable,
 {
     /// Append another element
-    pub fn followed_by<R>(self, r: Constrained<R>) -> Planner<Self, R>
+    pub fn followed_by<R>(self, loglabel: &'static str, r: Constrained<R>) -> Planner<Self, R>
     where
         R: Renderable,
     {
-        Planner::new(self, r)
+        Planner::new(loglabel, self, r)
     }
 
     /// Adjust the margin as per [Layout::margin]
@@ -90,7 +97,26 @@ where
     P: sealed::Precedent,
     S: Renderable,
 {
+    #[tracing::instrument(skip(buf))]
     fn render(self, area: Rect, buf: &mut Buffer) {
-        self.render_plan(vec![], area, buf);
+        let loglabel = self.loglabel;
+        if area.is_empty() {
+            tracing::warn!(?loglabel, "empty area detected");
+        }
+        self.render_plan(loglabel, vec![], area, buf);
+    }
+}
+
+impl<P, S> Debug for Planner<P, S>
+where
+    P: sealed::Precedent,
+    S: Renderable,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut dt = f.debug_tuple("Planner<ish>");
+        for c in self.dyn_debugs() {
+            dt.field(c);
+        }
+        dt.finish()
     }
 }

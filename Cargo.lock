@@ -760,6 +760,7 @@ dependencies = [
  "derive-new",
  "derive_more",
  "ratatui",
+ "tracing",
  "tui-textarea",
 ]
 

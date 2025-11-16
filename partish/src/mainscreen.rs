@@ -23,8 +23,8 @@ impl Renderable for &MainScreen {
             .border_style(Style::new().green())
             .then(&self.input)
             .constrained(Length(self.input.height().into_u16()))
-            .on_top()
-            .followed_by(self.stack.constrained(Fill(1)))
+            .on_top("input")
+            .followed_by("stack", self.stack.constrained(Fill(1)))
     }
 }
 

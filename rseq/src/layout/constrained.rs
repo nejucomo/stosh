@@ -19,12 +19,12 @@ where
     R: Renderable,
 {
     /// Place `self` to the left of another widget
-    pub fn on_left(self) -> Planner<Layout, R> {
-        Planner::new_direction(Direction::Horizontal, self)
+    pub fn on_left(self, loglabel: &'static str) -> Planner<Layout, R> {
+        Planner::new_direction(loglabel, Direction::Horizontal, self)
     }
 
     /// Place `self` to the left of another widget
-    pub fn on_top(self) -> Planner<Layout, R> {
-        Planner::new_direction(Direction::Vertical, self)
+    pub fn on_top(self, loglabel: &'static str) -> Planner<Layout, R> {
+        Planner::new_direction(loglabel, Direction::Vertical, self)
     }
 }
