@@ -1,28 +1,36 @@
+use std::borrow::Cow;
+use std::sync::LazyLock;
+
+use indoc::indoc;
+use regex::Regex;
+
 #[cfg(test)]
 mod tests;
 
-pub fn type_name_concise<T>() -> String
+pub fn type_name_concise<T>() -> Cow<'static, str>
 where
     T: ?Sized,
 {
     simplify_type_name(std::any::type_name::<T>())
 }
 
-fn simplify_type_name(full: &str) -> String {
-    let frag = if let Some((ix, _)) = full
-        .char_indices()
-        .find(|&(_, c)| !(c == ':' || c == '_' || c.is_ascii_alphanumeric()))
-    {
-        let (s, _) = full.split_at(ix);
-        s
-    } else {
-        full
-    };
+static REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        indoc! { r#"
+            (?ix)
+            # ^- case insensitive and verbose mode.
 
-    if frag.is_empty() {
-        full
-    } else {
-        frag.rsplit_once("::").map(|(_, s)| s).unwrap_or(frag)
-    }
-    .to_string()
+            # any number of path prefixes:
+            ([a-z_][a-z0-9_]*::)*
+
+            # the final target path suffix:
+            (?<SUFFIX>[a-z_][a-z0-9_]*)
+        "# }
+        .trim(),
+    )
+    .unwrap()
+});
+
+fn simplify_type_name(name: &str) -> Cow<'_, str> {
+    REGEX.replace_all(name, "${SUFFIX}")
 }
