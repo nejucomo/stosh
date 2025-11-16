@@ -19,11 +19,13 @@ pub(crate) struct Portal {
 impl Portal {
     pub(crate) fn new(histix: usize, mut input: cmd::TextArea) -> Self {
         let ds = Style::default();
+        let mut output = cmd::TextArea::default().set_style(ds.blue().on_black());
+        output.insert_str("example\noutput\n is multiple lines");
 
         Portal {
             histix,
             input: input.reset_style().set_style(ds.gray().on_dark_gray()),
-            output: cmd::TextArea::default().set_style(ds.blue().on_black()),
+            output,
         }
     }
 
@@ -40,11 +42,14 @@ impl Renderable for &Portal {
         prompt
             .constrained(Length(pwidth))
             .on_left()
-            .followed_by(self.input.constrained(Fill(1)))
+            .followed_by(
+                self.input
+                    .constrained(Length(1))
+                    .on_top()
+                    .followed_by(self.output.constrained(Fill(1)))
+                    .constrained(Fill(1)),
+            )
             .horizontal_margin(1)
             .spacing(1)
-            .constrained(Length(1))
-            .on_top()
-            .followed_by(self.output.constrained(Fill(1)))
     }
 }
