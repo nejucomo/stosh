@@ -1,17 +1,20 @@
+mod entries;
+
 use std::fmt::Debug;
 
 use debug_concise::DebugElide;
 use type_name_concise::type_name_concise;
 
+pub use self::entries::Entries;
+
 pub trait DebugRollup: Debug {
     fn fmt_rollup(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}<", type_name_concise::<Self>())?;
-        f.debug_list().entries(self.dyn_debugs()).finish()?;
-        write!(f, ">")?;
-        Ok(())
+        f.debug_tuple(&type_name_concise::<Self>(true))
+            .field(&self.rollup_entries())
+            .finish()
     }
 
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>>;
+    fn rollup_entries(&self) -> Entries<'_>;
 }
 
 /// implement [Debug] via [DebugRollup]
@@ -40,8 +43,8 @@ impl<T> DebugRollup for &T
 where
     T: DebugRollup,
 {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
-        (*self).dyn_debugs()
+    fn rollup_entries(&self) -> Entries<'_> {
+        (*self).rollup_entries()
     }
 }
 
@@ -50,11 +53,9 @@ where
     A: DebugRollup,
     B: DebugRollup,
 {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
+    fn rollup_entries(&self) -> Entries<'_> {
         let (a, b) = self;
-        let mut v = a.dyn_debugs();
-        v.push(Box::new(b));
-        v
+        a.rollup_entries().with(b)
     }
 }
 
@@ -64,35 +65,32 @@ where
     B: DebugRollup,
     C: DebugRollup,
 {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
+    fn rollup_entries(&self) -> Entries<'_> {
         let (a, b, c) = self;
-        let mut v = a.dyn_debugs();
-        v.push(Box::new(b));
-        v.push(Box::new(c));
-        v
+        a.rollup_entries().with(b).with(c)
     }
 }
 
 impl DebugRollup for ratatui::layout::Layout {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
-        vec![]
+    fn rollup_entries(&self) -> Entries<'_> {
+        Entries::default()
     }
 }
 
 impl DebugRollup for ratatui::style::Style {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
-        vec![Box::new(DebugElide(self))]
+    fn rollup_entries(&self) -> Entries<'_> {
+        Entries::new(DebugElide(self))
     }
 }
 
 impl DebugRollup for ratatui::widgets::Clear {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
-        vec![Box::new(DebugElide(self))]
+    fn rollup_entries(&self) -> Entries<'_> {
+        Entries::new(DebugElide(self))
     }
 }
 
 impl<'a> DebugRollup for ratatui::widgets::Block<'a> {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
-        vec![Box::new(DebugElide(self))]
+    fn rollup_entries(&self) -> Entries<'_> {
+        Entries::new(DebugElide(self))
     }
 }

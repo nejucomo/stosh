@@ -1,6 +1,7 @@
 use crossterm::event::Event::{self, Key};
 use crossterm::event::KeyCode::Enter;
 use crossterm::event::{KeyEvent, KeyModifiers};
+use derive_debug::Dbg;
 use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize};
 use ratatui::text::Line;
@@ -11,10 +12,15 @@ use tui_textarea::TextArea;
 use crate::handler::Handler;
 use crate::u16util::IntoU16 as _;
 
-#[derive(Debug)]
+#[derive(Dbg)]
 pub(crate) struct Input {
+    #[dbg(formatter = "fmt_text_area")]
     ta: TextArea<'static>,
     histix: usize,
+}
+
+fn fmt_text_area(ta: &TextArea<'static>) -> String {
+    format!("{:?}", ta.lines())
 }
 
 impl Input {

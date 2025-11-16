@@ -6,6 +6,7 @@ edition.workspace = true
 [dependencies]
 clap = { workspace = true, features = ["derive"] }
 crossterm = { workspace = true, features = ["event-stream"] }
+derive-debug.workspace = true
 derive-new.workspace = true
 derive_more = { workspace = true, features = ["as_ref", "deref"] }
 dirs.workspace = true

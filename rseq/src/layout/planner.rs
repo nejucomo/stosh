@@ -111,10 +111,8 @@ where
     P: sealed::Precedent,
     S: Renderable,
 {
-    fn dyn_debugs(&self) -> Vec<Box<dyn std::fmt::Debug + '_>> {
-        let mut v = self.precedent.dyn_debugs();
-        v.push(Box::new(&self.subsequent));
-        v
+    fn rollup_entries(&self) -> debug_rollup::Entries<'_> {
+        self.precedent.rollup_entries().with(&self.subsequent)
     }
 }
 

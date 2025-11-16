@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use debug_rollup::{DebugRollup, delegate_debug_to_rollup};
 use derive_new::new;
 use ratatui::buffer::Buffer;
@@ -64,9 +62,7 @@ where
     T: RenderableSeq,
     R: Renderable,
 {
-    fn dyn_debugs(&self) -> Vec<Box<dyn Debug + '_>> {
-        let mut v = self.init.dyn_debugs();
-        v.push(Box::new(&self.r));
-        v
+    fn rollup_entries(&self) -> debug_rollup::Entries<'_> {
+        self.init.rollup_entries().with(&self.r)
     }
 }

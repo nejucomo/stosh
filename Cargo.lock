@@ -693,6 +693,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "crossterm",
+ "derive-debug",
  "derive-new",
  "derive_more",
  "dirs",
