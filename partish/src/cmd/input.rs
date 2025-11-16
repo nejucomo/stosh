@@ -24,8 +24,8 @@ impl Input {
     }
 
     fn reset_style(&mut self) {
+        self.ta.reset_style();
         self.ta.set_cursor_style(Style::default().on_light_cyan());
-        self.ta.set_cursor_line_style(Style::default());
         self.ta.set_style(Style::default().gray().on_dark_gray());
     }
 }

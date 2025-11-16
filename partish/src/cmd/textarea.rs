@@ -23,6 +23,12 @@ impl TextArea {
     pub(crate) fn height(&self) -> usize {
         self.0.lines().len()
     }
+
+    pub(crate) fn reset_style(&mut self) {
+        self.0.set_cursor_style(Style::default());
+        self.0.set_cursor_line_style(Style::default());
+        self.0.set_style(Style::default());
+    }
 }
 
 impl Renderable for &TextArea {
