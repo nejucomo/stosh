@@ -42,8 +42,8 @@ impl Renderable for &Input {
 
         prompt
             .constrained(Length(pwidth))
-            .on_left("prompt")
-            .followed_by("ta", self.ta.constrained(Fill(1)))
+            .on_left()
+            .followed_by(self.ta.constrained(Fill(1)))
             .horizontal_margin(1)
             .spacing(1)
     }

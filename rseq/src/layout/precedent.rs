@@ -68,8 +68,6 @@ where
         buf: &mut Buffer,
     ) -> Rc<[Rect]> {
         let Planner {
-            loglabel: my_loglabel,
-            dir,
             precedent,
             subsequent: Constrained { constraint, r },
         } = self;
@@ -83,7 +81,7 @@ where
         let ix = areacnt - 1 - revix;
         let render_area = areas[ix];
 
-        tracing::warn!(?my_loglabel, ?dir, ?areacnt, ?ix, ?render_area, "bleep");
+        tracing::warn!(?areacnt, ?ix, ?render_area, "bleep");
         r.into_widget().render(render_area, buf);
         areas
     }

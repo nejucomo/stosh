@@ -19,8 +19,6 @@ where
     P: sealed::Precedent,
     S: Renderable,
 {
-    loglabel: &'static str,
-    dir: Direction,
     precedent: P,
     subsequent: Constrained<S>,
 }
@@ -29,14 +27,10 @@ impl<S> Planner<Layout, S>
 where
     S: Renderable,
 {
-    pub(super) fn new_direction(
-        loglabel: &'static str,
-        d: Direction,
-        subsequent: Constrained<S>,
-    ) -> Self {
+    pub(super) fn new_direction(d: Direction, subsequent: Constrained<S>) -> Self {
         let c: [Constraint; 0] = [];
         let layout = Layout::new(d, c);
-        Planner::new(loglabel, d, layout, subsequent)
+        Planner::new(layout, subsequent)
     }
 }
 
@@ -46,11 +40,11 @@ where
     S: Renderable,
 {
     /// Append another element
-    pub fn followed_by<R>(self, loglabel: &'static str, r: Constrained<R>) -> Planner<Self, R>
+    pub fn followed_by<R>(self, r: Constrained<R>) -> Planner<Self, R>
     where
         R: Renderable,
     {
-        Planner::new(loglabel, self.dir, self, r)
+        Planner::new(self, r)
     }
 
     /// Adjust the margin as per [Layout::margin]
@@ -99,9 +93,8 @@ where
 {
     #[tracing::instrument(skip(buf))]
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let tag = (self.loglabel, self.dir);
         if area.is_empty() {
-            tracing::warn!(?tag, ?self.dir, "empty area detected");
+            tracing::warn!("empty area detected");
         }
         self.render_plan(vec![], area, buf);
     }

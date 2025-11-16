@@ -39,12 +39,12 @@ impl Renderable for &Portal {
 
         prompt
             .constrained(Length(pwidth))
-            .on_left("portal.prompt")
-            .followed_by("portal.input", self.input.constrained(Fill(1)))
+            .on_left()
+            .followed_by(self.input.constrained(Fill(1)))
             .horizontal_margin(1)
             .spacing(1)
             .constrained(Length(1))
-            .on_top("portal.histix-and-input")
-            .followed_by("portal.output", self.output.constrained(Fill(1)))
+            .on_top()
+            .followed_by(self.output.constrained(Fill(1)))
     }
 }

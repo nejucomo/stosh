@@ -34,10 +34,10 @@ impl Renderable for &UI {
                     )
                         .then(line)
                         .constrained(Constraint::Length(width))
-                        .on_left("dialog width")
+                        .on_left()
                         .flex(Flex::Center)
                         .constrained(Constraint::Length(height))
-                        .on_top("dialog height")
+                        .on_top()
                         .flex(Flex::Center),
                 )
             } else {

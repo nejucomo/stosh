@@ -21,11 +21,10 @@ impl Renderable for &MainScreen {
             .title_top(Line::from("partish").light_green().right_aligned())
             .borders(Borders::TOP)
             .border_style(Style::new().green())
-            .style(Style::default())
             .then(&self.input)
             .constrained(Length(1 + self.input.height().into_u16()))
-            .on_top("input")
-            .followed_by("stack", self.stack.constrained(Fill(1)))
+            .on_top()
+            .followed_by(self.stack.constrained(Fill(1)))
     }
 }
 
