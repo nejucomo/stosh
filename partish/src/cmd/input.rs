@@ -9,6 +9,7 @@ use ratatui_rseq::Renderable;
 
 use crate::cmd::TextArea;
 use crate::handler::Handler;
+use crate::prompt;
 use crate::u16util::IntoU16 as _;
 
 #[derive(Debug)]
@@ -28,8 +29,8 @@ impl Default for Input {
     fn default() -> Self {
         Input {
             ta: TextArea::default()
-                .set_cursor_style(Style::default().on_light_cyan())
-                .set_style(Style::default().gray().on_dark_gray()),
+                .set_cursor_style(Style::default().on_blue())
+                .set_style(Style::default().black().on_gray()),
             histix: 0,
         }
     }
@@ -37,7 +38,7 @@ impl Default for Input {
 
 impl Renderable for &Input {
     fn into_widget(self) -> impl Widget {
-        let prompt = Line::from(format!("⟨{}⟩", self.histix).black().on_light_cyan());
+        let prompt = Line::from(prompt::text(self.histix).black().on_light_cyan());
         let pwidth = prompt.width().into_u16();
 
         prompt

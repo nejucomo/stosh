@@ -5,8 +5,8 @@ use ratatui::text::Line;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
-use crate::cmd;
 use crate::u16util::IntoU16 as _;
+use crate::{cmd, prompt};
 
 /// A command portal allows viewing details about a command
 #[derive(Debug)]
@@ -34,7 +34,7 @@ impl Portal {
 
 impl Renderable for &Portal {
     fn into_widget(self) -> impl Widget {
-        let prompt = Line::from(format!("⟨{}⟩", self.histix).black().on_light_cyan());
+        let prompt = Line::from(prompt::text(self.histix).black().on_cyan());
         let pwidth = prompt.width().into_u16();
 
         prompt

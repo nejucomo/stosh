@@ -10,6 +10,7 @@ mod cmd;
 mod handler;
 mod log;
 mod mainscreen;
+mod prompt;
 mod run;
 mod u16util;
 mod ui;
