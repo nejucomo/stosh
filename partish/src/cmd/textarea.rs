@@ -1,5 +1,6 @@
 use crossterm::event::Event;
 use derive_debug::Dbg;
+use derive_more::{Deref, DerefMut};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::{Style, Stylize as _};
@@ -10,7 +11,7 @@ use crate::handler::Handler;
 
 type Inner = tui_textarea::TextArea<'static>;
 
-#[derive(Dbg)]
+#[derive(Default, Dbg, Deref, DerefMut)]
 pub(crate) struct TextArea(#[dbg(formatter = "fmt_text_area")] Inner);
 
 fn fmt_text_area(ta: &Inner) -> String {
@@ -21,20 +22,6 @@ impl TextArea {
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
         self.0.lines().len()
-    }
-
-    pub(crate) fn insert_newline(&mut self) {
-        self.0.insert_newline();
-    }
-}
-
-impl Default for TextArea {
-    fn default() -> Self {
-        let mut inner = Inner::default();
-        inner.set_cursor_style(Style::reset().on_light_cyan());
-        inner.set_cursor_line_style(Style::default());
-        inner.set_style(Style::reset().gray().on_dark_gray());
-        TextArea(inner)
     }
 }
 

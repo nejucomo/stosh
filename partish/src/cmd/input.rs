@@ -11,7 +11,7 @@ use crate::cmd::TextArea;
 use crate::handler::Handler;
 use crate::u16util::IntoU16 as _;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub(crate) struct Input {
     ta: TextArea,
     histix: usize,
@@ -21,6 +21,23 @@ impl Input {
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
         self.ta.height()
+    }
+
+    fn reset_style(&mut self) {
+        self.ta.set_cursor_style(Style::default().on_light_cyan());
+        self.ta.set_cursor_line_style(Style::default());
+        self.ta.set_style(Style::default().gray().on_dark_gray());
+    }
+}
+
+impl Default for Input {
+    fn default() -> Self {
+        let mut me = Input {
+            ta: TextArea::default(),
+            histix: 0,
+        };
+        me.reset_style();
+        me
     }
 }
 
@@ -65,6 +82,7 @@ impl Handler<Event> for Input {
                 Ok(if send_cmd {
                     let resp = (self.histix, std::mem::take(&mut self.ta));
                     self.histix += 1;
+                    self.reset_style();
                     Some(resp)
                 } else {
                     self.ta.insert_newline();

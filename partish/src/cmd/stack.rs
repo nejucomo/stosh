@@ -30,12 +30,10 @@ impl Renderable for &Stack {
 
 impl Widget for &Stack {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        buf.set_style(area, Style::reset().cyan().on_green());
-
         let areas =
             Layout::vertical(std::iter::repeat_n(Ratio(1, 3), self.portals.len())).split(area);
 
-        for (i, portal) in self.portals.iter().enumerate() {
+        for (i, portal) in self.portals.iter().rev().enumerate() {
             portal.into_widget().render(areas[i], buf);
         }
     }
