@@ -1,47 +1,26 @@
 use crossterm::event::Event::{self, Key};
 use crossterm::event::KeyCode::Enter;
 use crossterm::event::{KeyEvent, KeyModifiers};
-use derive_debug::Dbg;
 use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize};
 use ratatui::text::Line;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
-use tui_textarea::TextArea;
 
+use crate::cmd::TextArea;
 use crate::handler::Handler;
 use crate::u16util::IntoU16 as _;
 
-#[derive(Dbg)]
+#[derive(Default, Debug)]
 pub(crate) struct Input {
-    #[dbg(formatter = "fmt_text_area")]
-    ta: TextArea<'static>,
+    ta: TextArea,
     histix: usize,
-}
-
-fn fmt_text_area(ta: &TextArea<'static>) -> String {
-    format!("{:?}", ta.lines())
 }
 
 impl Input {
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
-        self.ta.lines().len()
-    }
-}
-
-impl Default for Input {
-    fn default() -> Self {
-        Self {
-            ta: {
-                let mut ta = TextArea::default();
-                ta.set_cursor_style(Style::reset().on_light_cyan());
-                ta.set_cursor_line_style(Style::default());
-                ta.set_style(Style::reset().gray().on_dark_gray());
-                ta
-            },
-            histix: 0,
-        }
+        self.ta.height()
     }
 }
 
@@ -60,7 +39,7 @@ impl Renderable for &Input {
 }
 
 impl Handler<Event> for Input {
-    type Response = std::io::Result<Option<Self>>;
+    type Response = std::io::Result<Option<TextArea>>;
 
     async fn handle(&mut self, ev: Event) -> Self::Response {
         match ev {
@@ -84,7 +63,7 @@ impl Handler<Event> for Input {
                 }
 
                 Ok(if send_cmd {
-                    Some(std::mem::take(self))
+                    Some(std::mem::take(&mut self.ta))
                 } else {
                     self.ta.insert_newline();
                     None
@@ -93,7 +72,7 @@ impl Handler<Event> for Input {
 
             // Forward all other events to `self.ta`:
             ev => {
-                self.ta.input(ev);
+                self.ta.handle(ev).await;
                 Ok(None)
             }
         }

@@ -39,9 +39,3 @@ impl<'a> Renderable for ratatui::text::Text<'a> {
         self
     }
 }
-
-impl<'a> Renderable for &tui_textarea::TextArea<'a> {
-    fn into_widget(self) -> impl Widget {
-        self
-    }
-}

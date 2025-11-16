@@ -7,7 +7,7 @@ use crate::cmd;
 /// A command portal allows viewing details about a command
 #[derive(Debug, new)]
 pub(crate) struct Portal {
-    cmd: cmd::Input,
+    text: cmd::TextArea,
 }
 
 impl Portal {
@@ -18,6 +18,6 @@ impl Portal {
 
 impl Renderable for &Portal {
     fn into_widget(self) -> impl Widget {
-        self.cmd.into_widget()
+        self.text.into_widget()
     }
 }
