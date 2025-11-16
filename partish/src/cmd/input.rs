@@ -39,7 +39,7 @@ impl Renderable for &Input {
 }
 
 impl Handler<Event> for Input {
-    type Response = std::io::Result<Option<TextArea>>;
+    type Response = std::io::Result<Option<(usize, TextArea)>>;
 
     async fn handle(&mut self, ev: Event) -> Self::Response {
         match ev {
@@ -63,7 +63,9 @@ impl Handler<Event> for Input {
                 }
 
                 Ok(if send_cmd {
-                    Some(std::mem::take(&mut self.ta))
+                    let resp = (self.histix, std::mem::take(&mut self.ta));
+                    self.histix += 1;
+                    Some(resp)
                 } else {
                     self.ta.insert_newline();
                     None

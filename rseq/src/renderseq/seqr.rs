@@ -29,6 +29,7 @@ where
     T: RenderableSeq,
     R: Renderable,
 {
+    #[tracing::instrument(skip(buf))]
     fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect {
         let area = self.init.render_initial(area, buf);
         self.r.into_widget().render(area, buf);

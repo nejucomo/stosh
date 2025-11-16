@@ -20,6 +20,7 @@ where
     S: Renderable,
 {
     loglabel: &'static str,
+    dir: Direction,
     precedent: P,
     subsequent: Constrained<S>,
 }
@@ -35,7 +36,7 @@ where
     ) -> Self {
         let c: [Constraint; 0] = [];
         let layout = Layout::new(d, c);
-        Planner::new(loglabel, layout, subsequent)
+        Planner::new(loglabel, d, layout, subsequent)
     }
 }
 
@@ -49,7 +50,7 @@ where
     where
         R: Renderable,
     {
-        Planner::new(loglabel, self, r)
+        Planner::new(loglabel, self.dir, self, r)
     }
 
     /// Adjust the margin as per [Layout::margin]
@@ -98,11 +99,11 @@ where
 {
     #[tracing::instrument(skip(buf))]
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let loglabel = self.loglabel;
+        let tag = (self.loglabel, self.dir);
         if area.is_empty() {
-            tracing::warn!(?loglabel, "empty area detected");
+            tracing::warn!(?tag, ?self.dir, "empty area detected");
         }
-        self.render_plan(loglabel, vec![], area, buf);
+        self.render_plan(vec![], area, buf);
     }
 }
 

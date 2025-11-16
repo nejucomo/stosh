@@ -12,8 +12,12 @@ pub(crate) struct Stack {
 }
 
 impl Stack {
-    pub(crate) fn handle_new_input(&mut self, input: cmd::TextArea) -> std::io::Result<()> {
-        self.portals.push(cmd::Portal::new(input));
+    pub(crate) fn handle_new_input(
+        &mut self,
+        histix: usize,
+        text: cmd::TextArea,
+    ) -> std::io::Result<()> {
+        self.portals.push(cmd::Portal::new(histix, text));
         Ok(())
     }
 }

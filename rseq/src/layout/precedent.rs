@@ -13,13 +13,7 @@ pub trait Precedent: DebugRollup {
     where
         F: FnOnce(Layout) -> Layout;
 
-    fn render_plan(
-        self,
-        loglabel: &'static str,
-        constraints: Vec<Constraint>,
-        area: Rect,
-        buf: &mut Buffer,
-    ) -> Rc<[Rect]>;
+    fn render_plan(self, constraints: Vec<Constraint>, area: Rect, buf: &mut Buffer) -> Rc<[Rect]>;
 }
 
 impl Precedent for Layout {
@@ -33,22 +27,20 @@ impl Precedent for Layout {
     #[tracing::instrument]
     fn render_plan(
         self,
-        caller_loglabel: &'static str,
         mut constraints: Vec<Constraint>,
         area: Rect,
         _: &mut Buffer,
     ) -> Rc<[Rect]> {
         constraints.reverse();
         let areas = self.constraints(constraints.clone()).split(area);
-        if !area.is_empty() && areas.iter().any(|a| a.is_empty()) {
-            tracing::warn!(
-                ?caller_loglabel,
-                ?area,
-                ?constraints,
-                ?areas,
-                "empty area in layout of non-empty area!!!"
-            );
-        }
+        // if !area.is_empty() && areas.iter().any(|a| a.is_empty()) {
+        tracing::warn!(
+            ?area,
+            ?constraints,
+            ?areas,
+            "bloop" // "empty area in layout of non-empty area!!!"
+        );
+        // }
         areas
     }
 }
@@ -63,22 +55,21 @@ where
         F: FnOnce(Layout) -> Layout,
     {
         Planner {
-            loglabel: self.loglabel,
             precedent: self.precedent.map_layout(f),
-            subsequent: self.subsequent,
+            ..self
         }
     }
 
     #[tracing::instrument(skip(buf))]
     fn render_plan(
         self,
-        caller_loglabel: &'static str,
         mut constraints: Vec<Constraint>,
         area: Rect,
         buf: &mut Buffer,
     ) -> Rc<[Rect]> {
         let Planner {
             loglabel: my_loglabel,
+            dir,
             precedent,
             subsequent: Constrained { constraint, r },
         } = self;
@@ -86,23 +77,14 @@ where
         let revix = constraints.len();
         constraints.push(constraint);
 
-        let areas = precedent.render_plan(caller_loglabel, constraints, area, buf);
+        let areas = precedent.render_plan(constraints, area, buf);
 
         let areacnt = areas.len();
         let ix = areacnt - 1 - revix;
         let render_area = areas[ix];
 
-        if !render_area.is_empty() {
-            r.into_widget().render(render_area, buf);
-        } else {
-            tracing::warn!(
-                ?my_loglabel,
-                ?areacnt,
-                ?ix,
-                ?render_area,
-                "my render area is empty"
-            );
-        }
+        tracing::warn!(?my_loglabel, ?dir, ?areacnt, ?ix, ?render_area, "bleep");
+        r.into_widget().render(render_area, buf);
         areas
     }
 }

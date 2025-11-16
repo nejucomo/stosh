@@ -63,8 +63,10 @@ impl RenderableSeq for ratatui::widgets::Clear {
 }
 
 impl<'a> RenderableSeq for ratatui::widgets::Block<'a> {
+    #[tracing::instrument(skip(self, buf))]
     fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect {
         let inner = self.inner(area);
+        tracing::warn!(?inner);
         self.render(area, buf);
         inner
     }

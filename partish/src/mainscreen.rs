@@ -22,7 +22,7 @@ impl Renderable for &MainScreen {
             .borders(Borders::TOP)
             .border_style(Style::new().green())
             .then(&self.input)
-            .constrained(Length(self.input.height().into_u16()))
+            .constrained(Length(1 + self.input.height().into_u16()))
             .on_top("input")
             .followed_by("stack", self.stack.constrained(Fill(1)))
     }
@@ -32,8 +32,8 @@ impl Handler<Event> for MainScreen {
     type Response = std::io::Result<bool>;
 
     async fn handle(&mut self, ev: Event) -> Self::Response {
-        if let Some(input) = self.input.handle(ev).await? {
-            self.stack.handle_new_input(input)?;
+        if let Some((histix, text)) = self.input.handle(ev).await? {
+            self.stack.handle_new_input(histix, text)?;
         }
         Ok(true)
     }

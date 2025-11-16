@@ -18,10 +18,9 @@ pub async fn run() -> std::io::Result<()> {
 async fn run_terminal_session() -> std::io::Result<()> {
     let mut term = TerminalSession::start()?;
     let mut ui = UI::default();
-    // let mut events = EventStream::new();
+    let mut events = EventStream::new();
 
     term.draw(&ui)?;
-    /*
     while let Some(event) = events.next().await.transpose()? {
         // ignore key event kind besides Press:
         if matches!(event, Key(KeyEvent { kind, .. }) if kind != Press) {
@@ -33,6 +32,5 @@ async fn run_terminal_session() -> std::io::Result<()> {
         }
         term.draw(&ui)?;
     }
-    */
     Ok(())
 }

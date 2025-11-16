@@ -7,6 +7,7 @@ use crate::cmd;
 /// A command portal allows viewing details about a command
 #[derive(Debug, new)]
 pub(crate) struct Portal {
+    histix: usize,
     text: cmd::TextArea,
 }
 
