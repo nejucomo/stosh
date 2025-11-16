@@ -1,7 +1,7 @@
 #[path = "precedent.rs"]
 mod sealed;
 
-use debug_rollup::delegate_debug_to_rollup;
+use debug_rollup::{DebugRollup, delegate_debug_to_rollup};
 use derive_new::new;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint, Direction, Flex, Layout, Rect, Spacing};
@@ -23,13 +23,6 @@ where
     precedent: P,
     subsequent: Constrained<S>,
 }
-
-delegate_debug_to_rollup!(
-    Planner<P, S>
-    where
-        P: sealed::Precedent,
-        S: Renderable,
-);
 
 impl<S> Planner<Layout, S>
 where
@@ -112,3 +105,22 @@ where
         self.render_plan(loglabel, vec![], area, buf);
     }
 }
+
+impl<P, S> DebugRollup for Planner<P, S>
+where
+    P: sealed::Precedent,
+    S: Renderable,
+{
+    fn dyn_debugs(&self) -> Vec<Box<dyn std::fmt::Debug + '_>> {
+        let mut v = self.precedent.dyn_debugs();
+        v.push(Box::new(&self.subsequent));
+        v
+    }
+}
+
+delegate_debug_to_rollup!(
+    Planner<P, S>
+    where
+        P: sealed::Precedent,
+        S: Renderable,
+);

@@ -106,15 +106,3 @@ where
         areas
     }
 }
-
-impl<P, S> DebugRollup for Planner<P, S>
-where
-    P: Precedent,
-    S: Renderable,
-{
-    fn dyn_debugs(&self) -> Vec<Box<dyn std::fmt::Debug + '_>> {
-        let mut v = self.precedent.dyn_debugs();
-        v.push(Box::new(&self.subsequent));
-        v
-    }
-}
