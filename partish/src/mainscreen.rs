@@ -1,17 +1,18 @@
 use crossterm::event::Event;
-use ratatui::layout::Constraint::Length;
+use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Widget};
 use ratatui_rseq::{Renderable, RenderableSeq as _};
 
-use crate::cmdinput::CommandInput;
+use crate::cmd;
 use crate::handler::Handler;
 use crate::u16util::IntoU16 as _;
 
 #[derive(Debug, Default)]
 pub(crate) struct MainScreen {
-    cmdinput: CommandInput,
+    input: cmd::Input,
+    stack: cmd::Stack,
 }
 
 impl Renderable for &MainScreen {
@@ -20,11 +21,10 @@ impl Renderable for &MainScreen {
             .title_top(Line::from("partish").light_green().right_aligned())
             .borders(Borders::TOP)
             .border_style(Style::new().green())
-            .then(
-                self.cmdinput
-                    .constrained(Length(self.cmdinput.height().into_u16()))
-                    .on_top(),
-            )
+            .then(&self.input)
+            .constrained(Length(self.input.height().into_u16()))
+            .on_top()
+            .followed_by(self.stack.constrained(Fill(1)))
     }
 }
 
@@ -32,10 +32,9 @@ impl Handler<Event> for MainScreen {
     type Response = std::io::Result<bool>;
 
     async fn handle(&mut self, ev: Event) -> Self::Response {
-        if let Some(cmd) = self.cmdinput.handle(ev).await? {
-            Err(std::io::Error::other(format!("handle cmd: {cmd:?}")))
-        } else {
-            Ok(true)
+        if let Some(input) = self.input.handle(ev).await? {
+            self.stack.handle_new_input(input)?;
         }
+        Ok(true)
     }
 }
