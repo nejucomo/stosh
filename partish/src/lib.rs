@@ -4,8 +4,14 @@
 //!
 //! This is different from a "terminal multiplexer" because there is only a single shell, and in fact, the author uses `partish` inside of a terminal multiplexer.
 #![deny(unsafe_code, missing_docs)]
-mod cmdinput;
+#![allow(dead_code, unused_imports, unused_mut)]
+mod cli;
+mod cmd;
 mod handler;
+mod log;
+mod mainscreen;
+mod prompt;
+mod rectext;
 mod run;
 mod u16util;
 mod ui;

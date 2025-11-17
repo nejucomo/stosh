@@ -1,0 +1,11 @@
+[package]
+name = "type-name-concise"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+indoc.workspace = true
+regex.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true

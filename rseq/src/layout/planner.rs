@@ -1,6 +1,7 @@
 #[path = "precedent.rs"]
 mod sealed;
 
+use debug_rollup::{DebugRollup, delegate_debug_to_rollup};
 use derive_new::new;
 use ratatui::buffer::Buffer;
 use ratatui::layout::{Constraint, Direction, Flex, Layout, Rect, Spacing};
@@ -11,7 +12,7 @@ use crate::layout::Constrained;
 use crate::layout::planner::sealed::Precedent as _;
 
 /// A one-dimensional layout planner
-#[derive(Debug, new)]
+#[derive(new)]
 #[new(visibility = "")]
 pub struct Planner<P, S>
 where
@@ -90,7 +91,28 @@ where
     P: sealed::Precedent,
     S: Renderable,
 {
+    #[tracing::instrument(skip(buf))]
     fn render(self, area: Rect, buf: &mut Buffer) {
+        if area.is_empty() {
+            tracing::warn!("empty area detected");
+        }
         self.render_plan(vec![], area, buf);
     }
 }
+
+impl<P, S> DebugRollup for Planner<P, S>
+where
+    P: sealed::Precedent,
+    S: Renderable,
+{
+    fn rollup_entries(&self) -> debug_rollup::Entries<'_> {
+        self.precedent.rollup_entries().with(&self.subsequent)
+    }
+}
+
+delegate_debug_to_rollup!(
+    Planner<P, S>
+    where
+        P: sealed::Precedent,
+        S: Renderable,
+);

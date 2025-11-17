@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use ratatui::layout::Constraint;
 use ratatui::widgets::Widget;
 
@@ -5,7 +7,7 @@ use crate::layout;
 use crate::widgets::OptionalWidget;
 
 /// A [Renderable] can convert to a [Widget] and provies composition methods
-pub trait Renderable: Sized {
+pub trait Renderable: Sized + Debug {
     /// Convert into a [Widget]
     fn into_widget(self) -> impl Widget;
 
@@ -33,12 +35,6 @@ impl<'a> Renderable for ratatui::text::Line<'a> {
 }
 
 impl<'a> Renderable for ratatui::text::Text<'a> {
-    fn into_widget(self) -> impl Widget {
-        self
-    }
-}
-
-impl<'a> Renderable for &tui_textarea::TextArea<'a> {
     fn into_widget(self) -> impl Widget {
         self
     }

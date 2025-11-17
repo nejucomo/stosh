@@ -6,53 +6,39 @@ use ratatui::style::{Style, Stylize};
 use ratatui::text::Line;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
-use tui_textarea::TextArea;
 
+use crate::cmd::TextArea;
 use crate::handler::Handler;
+use crate::prompt;
 use crate::u16util::IntoU16 as _;
 
 #[derive(Debug)]
-pub(crate) struct CommandInput {
-    ta: TextArea<'static>,
+pub(crate) struct Input {
+    ta: TextArea,
+    histix: usize,
 }
 
-impl CommandInput {
+impl Input {
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
-        self.ta.lines().len()
-    }
-
-    fn new_text_area() -> TextArea<'static> {
-        let mut ta = TextArea::default();
-        ta.set_cursor_style(Style::reset().on_light_cyan());
-        ta.set_cursor_line_style(Style::default());
-        ta.set_style(Style::reset().gray().on_dark_gray());
-        ta
-    }
-
-    fn pop_text(&mut self) -> String {
-        std::mem::replace(&mut self.ta, Self::new_text_area())
-            .into_lines()
-            .into_iter()
-            .map(|mut s| {
-                s.push('\n');
-                s
-            })
-            .collect()
+        self.ta.height()
     }
 }
 
-impl Default for CommandInput {
+impl Default for Input {
     fn default() -> Self {
-        Self {
-            ta: Self::new_text_area(),
+        Input {
+            ta: TextArea::default()
+                .set_cursor_style(Style::default().on_blue())
+                .set_style(Style::default().black().on_gray()),
+            histix: 0,
         }
     }
 }
 
-impl Renderable for &CommandInput {
+impl Renderable for &Input {
     fn into_widget(self) -> impl Widget {
-        let prompt = Line::from("⟨0⟩".black().on_light_cyan());
+        let prompt = Line::from(prompt::text(self.histix).black().on_light_cyan());
         let pwidth = prompt.width().into_u16();
 
         prompt
@@ -64,8 +50,8 @@ impl Renderable for &CommandInput {
     }
 }
 
-impl Handler<Event> for CommandInput {
-    type Response = std::io::Result<Option<String>>;
+impl Handler<Event> for Input {
+    type Response = std::io::Result<Option<(usize, TextArea)>>;
 
     async fn handle(&mut self, ev: Event) -> Self::Response {
         match ev {
@@ -89,7 +75,9 @@ impl Handler<Event> for CommandInput {
                 }
 
                 Ok(if send_cmd {
-                    Some(self.pop_text())
+                    let Input { histix, ta } = std::mem::take(self);
+                    self.histix = histix + 1;
+                    Some((histix, ta))
                 } else {
                     self.ta.insert_newline();
                     None
@@ -98,7 +86,7 @@ impl Handler<Event> for CommandInput {
 
             // Forward all other events to `self.ta`:
             ev => {
-                self.ta.input(ev);
+                self.ta.handle(ev).await;
                 Ok(None)
             }
         }

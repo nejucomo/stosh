@@ -2,6 +2,7 @@ mod seqr;
 
 pub use self::seqr::SeqRenderable;
 
+use debug_rollup::DebugRollup;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::widgets::Widget;
@@ -11,7 +12,7 @@ use crate::Renderable;
 /// These are "builder" types which produce a [Renderable] with [RenderableSeq::then]
 ///
 /// The impls are often containers or other building blocks for rendering.
-pub trait RenderableSeq: Sized {
+pub trait RenderableSeq: Sized + DebugRollup {
     /// The impls handle special rendering here, returning a new context
     fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect;
 
@@ -21,17 +22,6 @@ pub trait RenderableSeq: Sized {
         R: Renderable,
     {
         SeqRenderable::new(self, r)
-    }
-}
-
-/// Every [Renderable] provides a [RenderableSeq] which overlays the subsequent item
-impl<R> RenderableSeq for R
-where
-    R: Renderable,
-{
-    fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect {
-        self.into_widget().render(area, buf);
-        area
     }
 }
 
@@ -73,8 +63,10 @@ impl RenderableSeq for ratatui::widgets::Clear {
 }
 
 impl<'a> RenderableSeq for ratatui::widgets::Block<'a> {
+    #[tracing::instrument(skip(self, buf))]
     fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect {
         let inner = self.inner(area);
+        tracing::warn!(?inner);
         self.render(area, buf);
         inner
     }

@@ -1,0 +1,59 @@
+use ratatui::buffer::Buffer;
+use ratatui::layout::{Constraint::Ratio, Layout, Rect};
+use ratatui::style::{Style, Stylize as _};
+use ratatui::widgets::Widget;
+use ratatui_rseq::Renderable;
+
+use crate::cmd;
+use crate::rectext::RectExt as _;
+use crate::u16util::IntoU16 as _;
+
+#[derive(Debug, Default)]
+pub(crate) struct Stack {
+    portals: Vec<cmd::Portal>,
+}
+
+impl Stack {
+    pub(crate) fn handle_new_input(
+        &mut self,
+        histix: usize,
+        text: cmd::TextArea,
+    ) -> std::io::Result<()> {
+        self.portals.push(cmd::Portal::new(histix, text));
+        Ok(())
+    }
+}
+
+impl Renderable for &Stack {
+    fn into_widget(self) -> impl Widget {
+        self
+    }
+}
+
+impl Widget for &Stack {
+    #[tracing::instrument(skip(buf))]
+    fn render(self, mut area: Rect, buf: &mut Buffer) {
+        let ratio = (1, 3);
+
+        for portal in self.portals.iter().rev() {
+            if area.height == 0 {
+                break;
+            }
+
+            let clipheight = area.height * ratio.1 / ratio.0;
+            let clipheight = if clipheight == 0 {
+                // Consume the remainder:
+                area.height
+            } else {
+                clipheight
+            };
+
+            let splitheight = std::cmp::min(portal.height().into_u16(), clipheight);
+            let (subarea, remaining) = area.split_vertically(splitheight);
+            tracing::debug!(?area.height, ?subarea.height, ?remaining.height);
+
+            portal.into_widget().render(subarea, buf);
+            area = remaining;
+        }
+    }
+}

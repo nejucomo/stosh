@@ -1,21 +1,37 @@
 [workspace]
 resolver = "3"
 members = [
-  "partish", "rseq",
+  "debug-concise",
+  "debug-rollup",
+  "partish",
+  "rseq",
+  "type-name-concise",
 ]
 
 [workspace.package]
 edition = "2024"
 
 [workspace.dependencies]
-ratatui-rseq = { path = "rseq" }
-
 clap = "4.5.51"
 crossterm = "0.28.1"
-futures = "0.3.31"
-derive-new = "0.7.0"
+debug-concise = { path = "debug-concise" }
+debug-rollup = { path = "debug-rollup" }
 derive_more = "2.0.1"
+derive-debug = "0.1.2"
+derive-new = "0.7.0"
+dirs = "6.0.0"
+futures = "0.3.31"
+indoc = "2.0.7"
+partish = { path = "partish" }
 portable-pty = "0.9.0"
 ratatui = "0.29.0"
+ratatui-rseq = { path = "rseq" }
+regex = "1.12.2"
+rseq = { path = "rseq" }
+test-case = "3.3.1"
+time = "0.3.44"
 tokio = "1.48.0"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.20"
 tui-textarea = "0.7.0"
+type-name-concise = { path = "type-name-concise" }
