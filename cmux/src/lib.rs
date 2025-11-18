@@ -1,14 +1,11 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! A [CommandMultiplexer] for interleaving subprocess I/O within a single task
+#![deny(missing_docs)]
+mod cmd;
+mod cmux;
+mod handle;
+mod stream;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use self::cmd::Command;
+pub use self::cmux::CommandMultiplexer;
+pub use self::handle::Handle;
+pub use self::stream::ProcessLineStream;
