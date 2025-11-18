@@ -1,6 +1,5 @@
 use ratatui::buffer::Buffer;
-use ratatui::layout::{Constraint::Ratio, Layout, Rect};
-use ratatui::style::{Style, Stylize as _};
+use ratatui::layout::Rect;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 

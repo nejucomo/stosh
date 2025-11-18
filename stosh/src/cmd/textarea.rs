@@ -1,9 +1,7 @@
 use crossterm::event::Event;
 use derive_debug::Dbg;
 use derive_more::{Deref, DerefMut};
-use ratatui::buffer::Buffer;
-use ratatui::layout::Rect;
-use ratatui::style::{Style, Stylize as _};
+use ratatui::style::Style;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
@@ -19,7 +17,7 @@ fn fmt_text_area(ta: &Inner) -> String {
 }
 
 impl TextArea {
-    pub(crate) fn reset_style(mut self) -> Self {
+    pub(crate) fn reset_style(self) -> Self {
         let s = Style::default();
 
         self.set_cursor_style(s)

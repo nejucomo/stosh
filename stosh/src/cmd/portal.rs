@@ -1,4 +1,3 @@
-use derive_new::new;
 use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
@@ -17,7 +16,7 @@ pub(crate) struct Portal {
 }
 
 impl Portal {
-    pub(crate) fn new(histix: usize, mut input: cmd::TextArea) -> Self {
+    pub(crate) fn new(histix: usize, input: cmd::TextArea) -> Self {
         let ds = Style::default();
         let mut output = cmd::TextArea::default().set_style(ds.blue().on_black());
         output.insert_str("hello\nworld\nhere\nis\nsome\ntext\nover\nlines");
