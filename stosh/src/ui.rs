@@ -1,10 +1,12 @@
-use crossterm::event::{Event, KeyCode};
+use crossterm::event::KeyEvent;
+use crossterm::event::{Event::Key, KeyCode, KeyEventKind::Press};
 use ratatui::layout::{Constraint, Flex};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, BorderType, Clear, Padding, Widget};
 use ratatui_rseq::{Renderable, RenderableSeq as _};
 
+use crate::event::InputEvent;
 use crate::handler::Handler;
 use crate::mainscreen::MainScreen;
 use crate::u16util::IntoU16 as _;
@@ -47,14 +49,19 @@ impl Renderable for &UI {
     }
 }
 
-impl Handler<Event> for UI {
+impl Handler<InputEvent> for UI {
     type Response = std::io::Result<bool>;
 
-    async fn handle(&mut self, ev: Event) -> Self::Response {
-        if self.exitdialog {
+    async fn handle(&mut self, ev: InputEvent) -> Self::Response {
+        use InputEvent::*;
+
+        // ignore key event kind besides Press:
+        if matches!(ev, Terminal(Key(KeyEvent { kind, .. })) if kind != Press) {
+            Ok(true)
+        } else if self.exitdialog {
             match ev {
-                Event::Key(kev) if kev.code == KeyCode::Char('y') => Ok(false),
-                Event::Key(kev) if kev.code == KeyCode::Char('n') => {
+                Terminal(Key(kev)) if kev.code == KeyCode::Char('y') => Ok(false),
+                Terminal(Key(kev)) if kev.code == KeyCode::Char('n') => {
                     self.exitdialog = false;
                     Ok(true)
                 }
@@ -62,11 +69,12 @@ impl Handler<Event> for UI {
                     "unhandled exit dialog event: {other:#?}"
                 ))),
             }
-        } else if matches!(ev, Event::Key(kev) if kev.code == KeyCode::Esc) {
+        } else if matches!(ev, Terminal(Key(kev)) if kev.code == KeyCode::Esc) {
             self.exitdialog = true;
             Ok(true)
         } else {
-            self.ms.handle(ev).await
+            self.ms.handle(ev).await?;
+            Ok(true)
         }
     }
 }

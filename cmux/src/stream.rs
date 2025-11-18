@@ -1,9 +1,9 @@
 use derive_new::new;
 use futures::Stream;
 use pin_project::pin_project;
-use tokio_process_stream::{Item, ProcessLineStream as Inner};
+use tokio_process_stream::ProcessLineStream as Inner;
 
-use crate::Handle;
+use crate::{ChildEvent, Handle};
 
 /// A wrapper around [tokio_process_stream::ProcessLineStream] which also provides a [Handle]
 #[derive(Debug, new)]
@@ -17,7 +17,7 @@ pub struct ProcessLineStream {
 }
 
 impl Stream for ProcessLineStream {
-    type Item = (Handle, Item<String>);
+    type Item = ChildEvent;
 
     fn poll_next(
         self: std::pin::Pin<&mut Self>,
@@ -27,6 +27,6 @@ impl Stream for ProcessLineStream {
         self.project()
             .inner
             .poll_next(cx)
-            .map(|optitem| optitem.map(|item| (handle, item)))
+            .map(|optitem| optitem.map(|item| ChildEvent { handle, item }))
     }
 }

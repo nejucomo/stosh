@@ -1,8 +1,10 @@
-use crossterm::event::{Event::Key, EventStream, KeyEvent, KeyEventKind::Press};
-use futures::StreamExt as _;
+use crossterm::event::EventStream;
+use futures::{StreamExt as _, stream};
 use ratatui_rseq::TerminalSession;
+use tokio_command_multiplexer::CommandMultiplexer;
 
 use crate::cli::Options;
+use crate::event::InputEvent;
 use crate::handler::Handler as _;
 use crate::log;
 use crate::ui::UI;
@@ -19,17 +21,21 @@ async fn run_terminal_session() -> std::io::Result<()> {
     let mut term = TerminalSession::start()?;
     let mut ui = UI::default();
     let mut events = EventStream::new();
+    let mut cmux = CommandMultiplexer::default();
 
     term.draw(&ui)?;
-    while let Some(event) = events.next().await.transpose()? {
-        // ignore key event kind besides Press:
-        if matches!(event, Key(KeyEvent { kind, .. }) if kind != Press) {
-            continue;
-        }
-
-        if !ui.handle(event).await? {
+    while let Some(evres) = stream::select(
+        (&mut events).map(InputEvent::try_from),
+        (&mut cmux).map(InputEvent::from).map(Ok),
+    )
+    .next()
+    .await
+    {
+        let ev = evres?;
+        if !ui.handle(ev).await? {
             break;
         }
+
         term.draw(&ui)?;
     }
     Ok(())

@@ -1,4 +1,3 @@
-use crossterm::event::Event;
 use ratatui::layout::Constraint::{Fill, Length};
 use ratatui::style::{Style, Stylize as _};
 use ratatui::text::Line;
@@ -6,6 +5,7 @@ use ratatui::widgets::{Block, Borders, Widget};
 use ratatui_rseq::{Renderable, RenderableSeq as _};
 
 use crate::cmd;
+use crate::event::InputEvent;
 use crate::handler::Handler;
 use crate::u16util::IntoU16 as _;
 
@@ -28,13 +28,22 @@ impl Renderable for &MainScreen {
     }
 }
 
-impl Handler<Event> for MainScreen {
-    type Response = std::io::Result<bool>;
+impl Handler<InputEvent> for MainScreen {
+    type Response = std::io::Result<()>;
 
-    async fn handle(&mut self, ev: Event) -> Self::Response {
-        if let Some((histix, text)) = self.input.handle(ev).await? {
-            self.stack.handle_new_input(histix, text)?;
+    async fn handle(&mut self, ev: InputEvent) -> Self::Response {
+        use InputEvent::*;
+
+        match ev {
+            Terminal(termev) => {
+                if let Some((histix, text)) = self.input.handle(termev).await? {
+                    self.stack.handle_new_input(histix, text)?;
+                }
+            }
+            Child(childev) => {
+                self.stack.handle(childev).await;
+            }
         }
-        Ok(true)
+        Ok(())
     }
 }

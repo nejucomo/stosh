@@ -2,8 +2,10 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
+use tokio_command_multiplexer::ChildEvent;
 
 use crate::cmd;
+use crate::handler::Handler;
 use crate::rectext::RectExt as _;
 use crate::u16util::IntoU16 as _;
 
@@ -54,5 +56,13 @@ impl Widget for &Stack {
             portal.into_widget().render(subarea, buf);
             area = remaining;
         }
+    }
+}
+
+impl Handler<ChildEvent> for Stack {
+    type Response = ();
+
+    async fn handle(&mut self, ev: ChildEvent) -> Self::Response {
+        todo!("unhandled: {ev:?}")
     }
 }

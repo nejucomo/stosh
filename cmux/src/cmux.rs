@@ -4,11 +4,10 @@ use derive_debug::Dbg;
 use futures::{Stream, stream};
 use pin_project::pin_project;
 use tokio::process;
-use tokio_process_stream::Item;
 
 use crate::handle::HandleAllocator;
 use crate::stream::ProcessLineStream;
-use crate::{Command, Handle};
+use crate::{ChildEvent, Command, Handle};
 
 /// Interleaving subprocess I/O within a single task
 #[derive(Dbg, Default)]
@@ -42,7 +41,7 @@ impl CommandMultiplexer {
 }
 
 impl Stream for CommandMultiplexer {
-    type Item = (Handle, Item<String>);
+    type Item = ChildEvent;
 
     fn poll_next(
         self: std::pin::Pin<&mut Self>,

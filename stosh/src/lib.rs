@@ -6,6 +6,7 @@
 #![deny(unsafe_code, missing_docs)]
 mod cli;
 mod cmd;
+mod event;
 mod handler;
 mod log;
 mod mainscreen;
