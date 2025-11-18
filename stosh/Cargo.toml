@@ -1,5 +1,5 @@
 [package]
-name = "partish"
+name = "stosh"
 version = "0.1.0"
 edition.workspace = true
 

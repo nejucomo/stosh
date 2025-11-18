@@ -18,7 +18,7 @@ pub(crate) struct MainScreen {
 impl Renderable for &MainScreen {
     fn into_widget(self) -> impl Widget {
         Block::new()
-            .title_top(Line::from("partish").light_green().right_aligned())
+            .title_top(Line::from("stosh").light_green().right_aligned())
             .borders(Borders::TOP)
             .border_style(Style::new().green())
             .then(&self.input)
