@@ -1,5 +1,5 @@
 {
-  description = "partish - a command stacker";
+  description = "stosh - a STack Of SHells";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -37,7 +37,7 @@
 
           meta = with pkgs.lib; {
             description = "a command stacker";
-            homepage = "https://github.com/nejucomo/partish";
+            homepage = "https://github.com/nejucomo/stosh";
             license = licenses.mit;
             maintainers = [ ];
           };

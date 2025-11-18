@@ -3,8 +3,8 @@ resolver = "3"
 members = [
   "debug-concise",
   "debug-rollup",
-  "partish",
   "rseq",
+  "stosh",
   "type-name-concise",
 ]
 
@@ -22,12 +22,12 @@ derive-new = "0.7.0"
 dirs = "6.0.0"
 futures = "0.3.31"
 indoc = "2.0.7"
-partish = { path = "partish" }
 portable-pty = "0.9.0"
 ratatui = "0.29.0"
 ratatui-rseq = { path = "rseq" }
 regex = "1.12.2"
 rseq = { path = "rseq" }
+stosh = { path = "stosh" }
 test-case = "3.3.1"
 time = "0.3.44"
 tokio = "1.48.0"
