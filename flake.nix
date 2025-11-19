@@ -24,7 +24,7 @@
       in
       {
         packages.default = pkgs.rustPlatform.buildRustPackage {
-          pname = "befungaton";
+          pname = "stosh";
           version = "0.1.0";
 
           src = ./.;
