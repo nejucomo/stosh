@@ -40,6 +40,10 @@ impl TextArea {
         self
     }
 
+    pub(crate) fn into_lines(self) -> Vec<String> {
+        self.0.into_lines()
+    }
+
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
         self.0.lines().len()
@@ -52,6 +56,16 @@ impl Default for TextArea {
     }
 }
 
+impl<I> From<I> for TextArea
+where
+    I: IntoIterator,
+    I::Item: Into<String>,
+{
+    fn from(it: I) -> Self {
+        Self(it.into()).reset_style()
+    }
+}
+
 impl Renderable for &TextArea {
     fn into_widget(self) -> impl Widget {
         &self.0
@@ -61,8 +75,7 @@ impl Renderable for &TextArea {
 impl Handler<Event> for TextArea {
     type Response = ();
 
-    fn handle(&mut self, ev: Event) -> std::io::Result<Self::Response> {
+    fn handle(&mut self, ev: Event) {
         self.0.input(ev);
-        Ok(())
     }
 }

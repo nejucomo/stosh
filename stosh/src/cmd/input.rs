@@ -54,7 +54,7 @@ impl Renderable for &Input {
 impl Handler<Event> for Input {
     type Response = ControlMessage;
 
-    fn handle(&mut self, ev: Event) -> std::io::Result<ControlMessage> {
+    fn handle(&mut self, ev: Event) -> ControlMessage {
         use ControlMessage::{LaunchCommand, NoCtrl};
 
         match ev {
@@ -69,7 +69,7 @@ impl Handler<Event> for Input {
                     false
                 } else {
                     // We ignore any other modifiers on return
-                    return Ok(NoCtrl);
+                    return NoCtrl;
                 };
 
                 if self.height() > 1 {
@@ -77,25 +77,20 @@ impl Handler<Event> for Input {
                     send_cmd = !send_cmd;
                 }
 
-                Ok(if send_cmd {
+                if send_cmd {
                     let Input { histix, ta } = std::mem::take(self);
                     self.histix = histix + 1;
-                    let mut cmd = "".to_string();
-                    for line in ta.lines() {
-                        cmd.push_str(line);
-                        cmd.push('\n');
-                    }
-                    LaunchCommand(histix, cmd)
+                    LaunchCommand(histix, ta.into_lines())
                 } else {
                     self.ta.insert_newline();
                     NoCtrl
-                })
+                }
             }
 
             // Forward all other events to `self.ta`:
             ev => {
-                self.ta.handle(ev)?;
-                Ok(NoCtrl)
+                self.ta.handle(ev);
+                NoCtrl
             }
         }
     }

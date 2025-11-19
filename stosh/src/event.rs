@@ -12,21 +12,24 @@ use crate::cmd;
 #[derive(Debug, From)]
 pub(crate) enum InputEvent {
     Terminal(TerminalEvent),
-    #[from(ChildEvent<cmd::Handle>)]
+    #[from(CommandEvent, ChildEvent<cmd::Handle>)]
     Child(CommandEvent),
 }
 
 #[derive(Debug, new)]
 pub struct CommandEvent {
     pub(crate) handle: cmd::Handle,
+    #[new(into)]
     pub(crate) info: CommandEventInfo,
 }
 
-#[derive(Debug)]
+#[derive(Debug, From)]
 pub enum CommandEventInfo {
+    #[from]
     Spawn(std::io::Result<()>),
     Stdout(String),
     Stderr(String),
+    #[from]
     Done(std::io::Result<ExitStatus>),
 }
 
@@ -34,5 +37,5 @@ pub enum CommandEventInfo {
 pub(crate) enum ControlMessage {
     NoCtrl,
     Exit,
-    LaunchCommand(usize, String),
+    LaunchCommand(usize, Vec<String>),
 }

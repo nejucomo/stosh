@@ -15,6 +15,29 @@ pub(crate) struct MainScreen {
     stack: cmd::Stack,
 }
 
+impl Handler<InputEvent> for MainScreen {
+    type Response = ControlMessage;
+
+    fn handle(&mut self, ev: InputEvent) -> ControlMessage {
+        use ControlMessage::LaunchCommand;
+        use InputEvent::*;
+
+        match ev {
+            Terminal(termev) => match self.input.handle(termev) {
+                LaunchCommand(h, cmdlines) => {
+                    self.stack.push(cmd::Portal::new(h, cmdlines.clone()));
+                    LaunchCommand(h, cmdlines)
+                }
+                other => other,
+            },
+            Child(childev) => {
+                self.stack.handle(childev);
+                ControlMessage::NoCtrl
+            }
+        }
+    }
+}
+
 impl Renderable for &MainScreen {
     fn into_widget(self) -> impl Widget {
         Block::new()
@@ -25,19 +48,5 @@ impl Renderable for &MainScreen {
             .constrained(Length(1 + self.input.height().into_u16()))
             .on_top()
             .followed_by(self.stack.constrained(Fill(1)))
-    }
-}
-
-impl Handler<InputEvent> for MainScreen {
-    type Response = ControlMessage;
-
-    fn handle(&mut self, ev: InputEvent) -> std::io::Result<ControlMessage> {
-        use InputEvent::*;
-
-        match ev {
-            Terminal(termev) => self.input.handle(termev),
-            Child(childev) => self.stack.handle(childev),
-            SpawnResult(spres) => self.stack.handle(spres),
-        }
     }
 }

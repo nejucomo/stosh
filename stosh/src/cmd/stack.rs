@@ -15,13 +15,16 @@ pub(crate) struct Stack {
 }
 
 impl Stack {
-    pub(crate) fn handle_new_input(
-        &mut self,
-        histix: usize,
-        text: cmd::TextArea,
-    ) -> std::io::Result<()> {
-        self.portals.push(cmd::Portal::new(histix, text));
-        Ok(())
+    pub(crate) fn push(&mut self, p: cmd::Portal) {
+        self.portals.push(p);
+    }
+}
+
+impl Handler<CommandEvent> for Stack {
+    type Response = ();
+
+    fn handle(&mut self, ev: CommandEvent) {
+        self.portals[ev.handle].handle(ev.info);
     }
 }
 
@@ -56,13 +59,5 @@ impl Widget for &Stack {
             portal.into_widget().render(subarea, buf);
             area = remaining;
         }
-    }
-}
-
-impl Handler<CommandEvent> for Stack {
-    type Response = ();
-
-    fn handle(&mut self, ev: CommandEvent) -> std::io::Result<()> {
-        self.portals[ev.handle].handle(ev.info)
     }
 }

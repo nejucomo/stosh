@@ -17,6 +17,41 @@ pub(crate) struct UI {
     exitdialog: bool,
 }
 
+impl Handler<InputEvent> for UI {
+    type Response = ControlMessage;
+
+    fn handle(&mut self, ev: InputEvent) -> ControlMessage {
+        use ControlMessage::{Exit, NoCtrl};
+        use InputEvent::*;
+
+        // ignore key event kind besides Press:
+        if matches!(ev, Terminal(Key(KeyEvent { kind, .. })) if kind != Press) {
+            NoCtrl
+        } else if self.exitdialog {
+            match ev {
+                Terminal(Key(kev)) if kev.code == KeyCode::Char('y') => Exit,
+                Terminal(Key(kev)) if kev.code == KeyCode::Char('n') => {
+                    self.exitdialog = false;
+                    NoCtrl
+                }
+                _ => {
+                    /*
+                     Err(std::io::Error::other(format!(
+                        "unhandled exit dialog event: {other:#?}"
+                    )))
+                    */
+                    NoCtrl
+                }
+            }
+        } else if matches!(ev, Terminal(Key(kev)) if kev.code == KeyCode::Esc) {
+            self.exitdialog = true;
+            NoCtrl
+        } else {
+            self.ms.handle(ev)
+        }
+    }
+}
+
 impl Renderable for &UI {
     fn into_widget(self) -> impl Widget {
         (Clear, Style::reset().gray().on_black())
@@ -46,35 +81,5 @@ impl Renderable for &UI {
                 None
             })
             .into_widget()
-    }
-}
-
-impl Handler<InputEvent> for UI {
-    type Response = ControlMessage;
-
-    fn handle(&mut self, ev: InputEvent) -> std::io::Result<ControlMessage> {
-        use ControlMessage::{Exit, NoCtrl};
-        use InputEvent::*;
-
-        // ignore key event kind besides Press:
-        if matches!(ev, Terminal(Key(KeyEvent { kind, .. })) if kind != Press) {
-            Ok(NoCtrl)
-        } else if self.exitdialog {
-            match ev {
-                Terminal(Key(kev)) if kev.code == KeyCode::Char('y') => Ok(Exit),
-                Terminal(Key(kev)) if kev.code == KeyCode::Char('n') => {
-                    self.exitdialog = false;
-                    Ok(NoCtrl)
-                }
-                other => Err(std::io::Error::other(format!(
-                    "unhandled exit dialog event: {other:#?}"
-                ))),
-            }
-        } else if matches!(ev, Terminal(Key(kev)) if kev.code == KeyCode::Esc) {
-            self.exitdialog = true;
-            Ok(NoCtrl)
-        } else {
-            self.ms.handle(ev)
-        }
     }
 }
