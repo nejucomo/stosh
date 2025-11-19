@@ -33,7 +33,9 @@ pub(crate) async fn run() -> std::io::Result<()> {
     term.draw(&evloop.ui)?;
     while let Some(ev) = evloop.next_event().await? {
         let ctrlmsg = evloop.ui.handle(ev);
-        if let Some(ev) = evloop.handle(ctrlmsg) {
+        if matches!(ctrlmsg, ControlMessage::Exit) {
+            break;
+        } else if let Some(ev) = evloop.handle(ctrlmsg) {
             evloop.inq.push_back(ev);
         }
         term.draw(&evloop.ui)?;
@@ -82,7 +84,7 @@ impl Handler<ControlMessage> for EventLoop {
 
         match ctrlmsg {
             NoCtrl => None,
-            Exit => None,
+            Exit => panic!("Remove this case with the type system."),
             LaunchCommand(h, cmdlines) => {
                 let res = self.parse_and_spawn(h, cmdlines);
                 Some(CommandEvent::new(h, res).into())
