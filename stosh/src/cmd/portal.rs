@@ -63,40 +63,49 @@ impl Renderable for &Portal {
         // Styles:
         let st_input = Style::default().gray().on_dark_gray();
         let st_text = Style::default().gray().on_black();
-        let st_margin = match self.outcome.as_ref() {
+        let st_status = match self.outcome.as_ref() {
             None => st_input,
             Some(Ok(status)) if status.success() => Style::default().gray().on_green(),
             Some(_) => Style::default().white().on_red(),
         };
-        let st_out = st_margin.gray();
-        let st_err = st_margin.yellow();
+        let st_out = st_text;
+        let st_err = st_text.yellow();
 
         let prompt = prompt::text(self.histix);
         let margin = prompt.replace(|_| true, " ");
+        let pad = " ".set_style(st_text);
 
         Some(prompt)
             .into_iter()
-            .chain(iter::repeat(margin))
+            .chain(iter::repeat(margin.clone()))
             .zip(self.input.iter())
             .map(|(mtext, text)| {
                 [
-                    mtext.set_style(st_margin),
+                    pad.clone(),
+                    mtext.set_style(st_status),
+                    pad.clone(),
                     text.as_str().set_style(st_input),
                 ]
             })
             .chain(self.output.iter().map(|(src, text)| {
+                let (m, st) = match src {
+                    Stdout => (margin.clone(), st_out),
+                    Stderr => (" ⚠️ ".to_string(), st_err),
+                };
+
                 [
-                    match src {
-                        Stdout => " • ".set_style(st_out),
-                        Stderr => " ⚠️ ".set_style(st_err),
-                    },
-                    text.as_str().set_style(st_text),
+                    pad.clone(),
+                    m.set_style(st),
+                    pad.clone(),
+                    text.as_str().set_style(st),
                 ]
             }))
             .chain(self.outcome.as_ref().map(|res| {
                 [
-                    " ◆ ".set_style(st_margin),
-                    format!("{res:?}").set_style(st_margin),
+                    pad.clone(),
+                    " ◆ ".set_style(st_status),
+                    pad.clone(),
+                    format!("{res:?}").set_style(st_text),
                 ]
             }))
             .map(Line::from_iter)

@@ -19,6 +19,7 @@ where
     #[dbg(placeholder = "…")]
     #[pin]
     sa: stream::SelectAll<ProcessLineStream<T>>,
+    #[dbg(placeholder = "…")]
     ph: PhantomData<T>,
 }
 

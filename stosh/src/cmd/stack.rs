@@ -9,7 +9,7 @@ use crate::handler::Handler;
 use crate::rectext::RectExt as _;
 use crate::u16util::IntoU16 as _;
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub(crate) struct Stack {
     portals: Vec<cmd::Portal>,
 }
@@ -61,5 +61,11 @@ impl Widget for &Stack {
             portal.into_widget().render(subarea, buf);
             area = remaining;
         }
+    }
+}
+
+impl std::fmt::Debug for Stack {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Stack<{} portals>", self.portals.len())
     }
 }
