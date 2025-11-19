@@ -1,0 +1,12 @@
+[package]
+name = "tokio-command-multiplexer"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+derive-debug.workspace = true
+derive-new.workspace = true
+futures.workspace = true
+pin-project.workspace = true
+tokio = { workspace = true, features = ["process"] }
+tokio-process-stream.workspace = true

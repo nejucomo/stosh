@@ -7,7 +7,8 @@ use ratatui::text::Line;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
-use crate::cmd::TextArea;
+use crate::cmd::{Handle, TextArea};
+use crate::event::ControlMessage;
 use crate::handler::Handler;
 use crate::prompt;
 use crate::u16util::IntoU16 as _;
@@ -15,7 +16,7 @@ use crate::u16util::IntoU16 as _;
 #[derive(Debug)]
 pub(crate) struct Input {
     ta: TextArea,
-    histix: usize,
+    histix: Handle,
 }
 
 impl Input {
@@ -51,9 +52,11 @@ impl Renderable for &Input {
 }
 
 impl Handler<Event> for Input {
-    type Response = std::io::Result<Option<(usize, TextArea)>>;
+    type Response = ControlMessage;
 
-    async fn handle(&mut self, ev: Event) -> Self::Response {
+    fn handle(&mut self, ev: Event) -> ControlMessage {
+        use ControlMessage::{LaunchCommand, NoCtrl};
+
         match ev {
             Key(KeyEvent {
                 code: Enter,
@@ -66,7 +69,7 @@ impl Handler<Event> for Input {
                     false
                 } else {
                     // We ignore any other modifiers on return
-                    return Ok(None);
+                    return NoCtrl;
                 };
 
                 if self.height() > 1 {
@@ -74,20 +77,20 @@ impl Handler<Event> for Input {
                     send_cmd = !send_cmd;
                 }
 
-                Ok(if send_cmd {
+                if send_cmd {
                     let Input { histix, ta } = std::mem::take(self);
                     self.histix = histix + 1;
-                    Some((histix, ta))
+                    LaunchCommand(histix, ta.into_lines())
                 } else {
                     self.ta.insert_newline();
-                    None
-                })
+                    NoCtrl
+                }
             }
 
             // Forward all other events to `self.ta`:
             ev => {
-                self.ta.handle(ev).await;
-                Ok(None)
+                self.ta.handle(ev);
+                NoCtrl
             }
         }
     }

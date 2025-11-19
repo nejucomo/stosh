@@ -1,9 +1,7 @@
 use crossterm::event::Event;
 use derive_debug::Dbg;
 use derive_more::{Deref, DerefMut};
-use ratatui::buffer::Buffer;
-use ratatui::layout::Rect;
-use ratatui::style::{Style, Stylize as _};
+use ratatui::style::Style;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
@@ -19,7 +17,7 @@ fn fmt_text_area(ta: &Inner) -> String {
 }
 
 impl TextArea {
-    pub(crate) fn reset_style(mut self) -> Self {
+    pub(crate) fn reset_style(self) -> Self {
         let s = Style::default();
 
         self.set_cursor_style(s)
@@ -42,6 +40,10 @@ impl TextArea {
         self
     }
 
+    pub(crate) fn into_lines(self) -> Vec<String> {
+        self.0.into_lines()
+    }
+
     /// The height of the CommandInput
     pub(crate) fn height(&self) -> usize {
         self.0.lines().len()
@@ -54,6 +56,16 @@ impl Default for TextArea {
     }
 }
 
+impl<I> From<I> for TextArea
+where
+    I: IntoIterator,
+    I::Item: Into<String>,
+{
+    fn from(it: I) -> Self {
+        Self(it.into()).reset_style()
+    }
+}
+
 impl Renderable for &TextArea {
     fn into_widget(self) -> impl Widget {
         &self.0
@@ -63,7 +75,7 @@ impl Renderable for &TextArea {
 impl Handler<Event> for TextArea {
     type Response = ();
 
-    async fn handle(&mut self, msg: Event) -> Self::Response {
-        self.0.input(msg);
+    fn handle(&mut self, ev: Event) {
+        self.0.input(ev);
     }
 }

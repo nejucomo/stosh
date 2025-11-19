@@ -1,10 +1,11 @@
 use ratatui::buffer::Buffer;
-use ratatui::layout::{Constraint::Ratio, Layout, Rect};
-use ratatui::style::{Style, Stylize as _};
+use ratatui::layout::Rect;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
 
 use crate::cmd;
+use crate::event::CommandEvent;
+use crate::handler::Handler;
 use crate::rectext::RectExt as _;
 use crate::u16util::IntoU16 as _;
 
@@ -14,13 +15,16 @@ pub(crate) struct Stack {
 }
 
 impl Stack {
-    pub(crate) fn handle_new_input(
-        &mut self,
-        histix: usize,
-        text: cmd::TextArea,
-    ) -> std::io::Result<()> {
-        self.portals.push(cmd::Portal::new(histix, text));
-        Ok(())
+    pub(crate) fn push(&mut self, p: cmd::Portal) {
+        self.portals.push(p);
+    }
+}
+
+impl Handler<CommandEvent> for Stack {
+    type Response = ();
+
+    fn handle(&mut self, ev: CommandEvent) {
+        self.portals[ev.handle].handle(ev.info);
     }
 }
 
@@ -50,7 +54,9 @@ impl Widget for &Stack {
 
             let splitheight = std::cmp::min(portal.height().into_u16(), clipheight);
             let (subarea, remaining) = area.split_vertically(splitheight);
-            tracing::debug!(?area.height, ?subarea.height, ?remaining.height);
+            if area.is_empty() || subarea.is_empty() || remaining.is_empty() {
+                tracing::warn!(?area.height, ?subarea.height, ?remaining.height, "empty areas in stack layout");
+            }
 
             portal.into_widget().render(subarea, buf);
             area = remaining;
