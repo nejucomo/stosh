@@ -1,4 +1,5 @@
 use std::marker::PhantomData;
+use std::process::Stdio;
 
 use derive_debug::Dbg;
 use futures::{Stream, stream};
@@ -27,7 +28,12 @@ where
 {
     /// Spawn a child
     pub fn spawn(&mut self, userdata: T, cmd: &mut Command) -> std::io::Result<()> {
-        let child = cmd.spawn()?;
+        let child = cmd
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
+
         self.sa.push(ProcessLineStream::new(userdata, child));
         Ok(())
     }
