@@ -88,7 +88,8 @@ impl Handler<ControlMessage> for EventLoop {
             NoCtrl => None,
             Exit => panic!("Remove this case with the type system."),
             LaunchCommand(h, cmdlines) => {
-                let res = self.parse_and_spawn(h, cmdlines);
+                let cmdwords = cmdlines.iter().flat_map(|line| line.split([' ', '\n']));
+                let res = self.parse_and_spawn(h, cmdwords);
                 Some(CommandEvent::new(h, res).into())
             }
         }
