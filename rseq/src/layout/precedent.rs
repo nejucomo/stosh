@@ -33,14 +33,14 @@ impl Precedent for Layout {
     ) -> Rc<[Rect]> {
         constraints.reverse();
         let areas = self.constraints(constraints.clone()).split(area);
-        // if !area.is_empty() && areas.iter().any(|a| a.is_empty()) {
-        tracing::warn!(
-            ?area,
-            ?constraints,
-            ?areas,
-            "bloop" // "empty area in layout of non-empty area!!!"
-        );
-        // }
+        if !area.is_empty() && areas.iter().any(|a| a.is_empty()) {
+            tracing::warn!(
+                ?area,
+                ?constraints,
+                ?areas,
+                "empty area in layout of non-empty area!!!"
+            );
+        }
         areas
     }
 }
@@ -81,7 +81,9 @@ where
         let ix = areacnt - 1 - revix;
         let render_area = areas[ix];
 
-        tracing::warn!(?areacnt, ?ix, ?render_area, "bleep");
+        if render_area.is_empty() {
+            tracing::warn!(?areacnt, ?ix, ?render_area, "empty render area");
+        }
         r.into_widget().render(render_area, buf);
         areas
     }

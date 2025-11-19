@@ -66,7 +66,9 @@ impl<'a> RenderableSeq for ratatui::widgets::Block<'a> {
     #[tracing::instrument(skip(self, buf))]
     fn render_initial(self, area: Rect, buf: &mut Buffer) -> Rect {
         let inner = self.inner(area);
-        tracing::warn!(?inner);
+        if inner.is_empty() {
+            tracing::warn!(?inner, "empty rendering area");
+        }
         self.render(area, buf);
         inner
     }

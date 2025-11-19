@@ -12,6 +12,7 @@ use crate::event::{CommandEvent, ControlMessage, InputEvent};
 use crate::handler::Handler;
 use crate::ui::UI;
 
+#[derive(Debug)]
 struct EventLoop {
     ui: UI,
     termev: EventStream,
@@ -41,9 +42,9 @@ pub(crate) async fn run() -> std::io::Result<()> {
 }
 
 impl EventLoop {
+    #[tracing::instrument]
     async fn next_event(&mut self) -> std::io::Result<Option<InputEvent>> {
-        // Pop any pending command event:
-        if let Some(inp) = self.inq.pop_front() {
+        let evres = if let Some(inp) = self.inq.pop_front() {
             Ok(Some(inp))
         } else {
             stream::select(
@@ -53,7 +54,10 @@ impl EventLoop {
             .next()
             .await
             .transpose()
-        }
+        };
+
+        tracing::debug!(?evres);
+        evres
     }
 
     fn parse_and_spawn<I, S>(&mut self, h: cmd::Handle, cmdargs: I) -> std::io::Result<()>

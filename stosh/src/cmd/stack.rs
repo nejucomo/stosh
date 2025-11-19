@@ -54,7 +54,9 @@ impl Widget for &Stack {
 
             let splitheight = std::cmp::min(portal.height().into_u16(), clipheight);
             let (subarea, remaining) = area.split_vertically(splitheight);
-            tracing::debug!(?area.height, ?subarea.height, ?remaining.height);
+            if area.is_empty() || subarea.is_empty() || remaining.is_empty() {
+                tracing::warn!(?area.height, ?subarea.height, ?remaining.height, "empty areas in stack layout");
+            }
 
             portal.into_widget().render(subarea, buf);
             area = remaining;

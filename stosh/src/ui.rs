@@ -20,9 +20,12 @@ pub(crate) struct UI {
 impl Handler<InputEvent> for UI {
     type Response = ControlMessage;
 
+    #[tracing::instrument]
     fn handle(&mut self, ev: InputEvent) -> ControlMessage {
         use ControlMessage::{Exit, NoCtrl};
         use InputEvent::*;
+
+        tracing::debug!(?ev);
 
         // ignore key event kind besides Press:
         if matches!(ev, Terminal(Key(KeyEvent { kind, .. })) if kind != Press) {
