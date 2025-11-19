@@ -1,47 +1,43 @@
-use std::ffi::OsStr;
+use std::marker::PhantomData;
 
 use derive_debug::Dbg;
 use futures::{Stream, stream};
 use pin_project::pin_project;
-use tokio::process;
+use tokio::process::Command;
 
-use crate::handle::HandleAllocator;
+use crate::ChildEvent;
 use crate::stream::ProcessLineStream;
-use crate::{ChildEvent, Command, Handle};
 
 /// Interleaving subprocess I/O within a single task
 #[derive(Dbg, Default)]
 #[pin_project]
-pub struct CommandMultiplexer {
-    halloc: HandleAllocator,
+pub struct CommandMultiplexer<T>
+where
+    T: Clone,
+{
     #[dbg(placeholder = "…")]
     #[pin]
-    sa: stream::SelectAll<ProcessLineStream>,
+    sa: stream::SelectAll<ProcessLineStream<T>>,
+    ph: PhantomData<T>,
 }
 
-impl CommandMultiplexer {
-    /// Construct a new [Command]
-    pub fn cmd<S>(&mut self, program: S) -> Command<'_>
-    where
-        S: AsRef<OsStr>,
-    {
-        let handle = self.halloc.next();
-        Command::new(self, handle, process::Command::new(program))
-    }
-
-    pub(crate) fn spawn_inner(
-        &mut self,
-        h: Handle,
-        mut innercmd: process::Command,
-    ) -> std::io::Result<Handle> {
-        let child = innercmd.spawn()?;
-        self.sa.push(ProcessLineStream::new(h, child));
-        Ok(h)
+impl<T> CommandMultiplexer<T>
+where
+    T: Clone,
+{
+    /// Spawn a child
+    pub fn spawn(&mut self, userdata: T, cmd: &mut Command) -> std::io::Result<()> {
+        let child = cmd.spawn()?;
+        self.sa.push(ProcessLineStream::new(userdata, child));
+        Ok(())
     }
 }
 
-impl Stream for CommandMultiplexer {
-    type Item = ChildEvent;
+impl<T> Stream for CommandMultiplexer<T>
+where
+    T: Clone,
+{
+    type Item = ChildEvent<T>;
 
     fn poll_next(
         self: std::pin::Pin<&mut Self>,

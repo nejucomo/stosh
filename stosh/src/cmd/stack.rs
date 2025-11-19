@@ -2,9 +2,9 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::widgets::Widget;
 use ratatui_rseq::Renderable;
-use tokio_command_multiplexer::ChildEvent;
 
 use crate::cmd;
+use crate::event::CommandEvent;
 use crate::handler::Handler;
 use crate::rectext::RectExt as _;
 use crate::u16util::IntoU16 as _;
@@ -59,10 +59,10 @@ impl Widget for &Stack {
     }
 }
 
-impl Handler<ChildEvent> for Stack {
+impl Handler<CommandEvent> for Stack {
     type Response = ();
 
-    async fn handle(&mut self, ev: ChildEvent) -> Self::Response {
-        todo!("unhandled: {ev:?}")
+    fn handle(&mut self, ev: CommandEvent) -> std::io::Result<()> {
+        self.portals[ev.handle].handle(ev.info)
     }
 }

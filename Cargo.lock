@@ -1020,6 +1020,7 @@ dependencies = [
  "time",
  "tokio",
  "tokio-command-multiplexer",
+ "tokio-process-stream",
  "tracing",
  "tracing-subscriber",
  "tui-textarea",

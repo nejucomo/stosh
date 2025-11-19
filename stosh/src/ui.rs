@@ -6,7 +6,7 @@ use ratatui::text::Line;
 use ratatui::widgets::{Block, BorderType, Clear, Padding, Widget};
 use ratatui_rseq::{Renderable, RenderableSeq as _};
 
-use crate::event::InputEvent;
+use crate::event::{ControlMessage, InputEvent};
 use crate::handler::Handler;
 use crate::mainscreen::MainScreen;
 use crate::u16util::IntoU16 as _;
@@ -50,20 +50,21 @@ impl Renderable for &UI {
 }
 
 impl Handler<InputEvent> for UI {
-    type Response = std::io::Result<bool>;
+    type Response = ControlMessage;
 
-    async fn handle(&mut self, ev: InputEvent) -> Self::Response {
+    fn handle(&mut self, ev: InputEvent) -> std::io::Result<ControlMessage> {
+        use ControlMessage::{Exit, NoCtrl};
         use InputEvent::*;
 
         // ignore key event kind besides Press:
         if matches!(ev, Terminal(Key(KeyEvent { kind, .. })) if kind != Press) {
-            Ok(true)
+            Ok(NoCtrl)
         } else if self.exitdialog {
             match ev {
-                Terminal(Key(kev)) if kev.code == KeyCode::Char('y') => Ok(false),
+                Terminal(Key(kev)) if kev.code == KeyCode::Char('y') => Ok(Exit),
                 Terminal(Key(kev)) if kev.code == KeyCode::Char('n') => {
                     self.exitdialog = false;
-                    Ok(true)
+                    Ok(NoCtrl)
                 }
                 other => Err(std::io::Error::other(format!(
                     "unhandled exit dialog event: {other:#?}"
@@ -71,10 +72,9 @@ impl Handler<InputEvent> for UI {
             }
         } else if matches!(ev, Terminal(Key(kev)) if kev.code == KeyCode::Esc) {
             self.exitdialog = true;
-            Ok(true)
+            Ok(NoCtrl)
         } else {
-            self.ms.handle(ev).await?;
-            Ok(true)
+            self.ms.handle(ev)
         }
     }
 }

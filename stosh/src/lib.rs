@@ -7,6 +7,7 @@
 mod cli;
 mod cmd;
 mod event;
+mod evloop;
 mod handler;
 mod log;
 mod mainscreen;

@@ -61,7 +61,8 @@ impl Renderable for &TextArea {
 impl Handler<Event> for TextArea {
     type Response = ();
 
-    async fn handle(&mut self, msg: Event) -> Self::Response {
-        self.0.input(msg);
+    fn handle(&mut self, ev: Event) -> std::io::Result<Self::Response> {
+        self.0.input(ev);
+        Ok(())
     }
 }
