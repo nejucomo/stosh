@@ -60,7 +60,7 @@ impl EventLoop {
             .transpose()
         };
 
-        tracing::debug!(?evres);
+        tracing::trace!(?evres);
         evres
     }
 

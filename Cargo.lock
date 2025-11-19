@@ -1216,6 +1216,7 @@ dependencies = [
  "pin-project",
  "tokio",
  "tokio-process-stream",
+ "tracing",
 ]
 
 [[package]]

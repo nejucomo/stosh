@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::process::Stdio;
 
@@ -14,7 +15,7 @@ use crate::stream::ProcessLineStream;
 #[pin_project]
 pub struct CommandMultiplexer<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     #[dbg(placeholder = "…")]
     #[pin]
@@ -25,16 +26,20 @@ where
 
 impl<T> CommandMultiplexer<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     /// Spawn a child
+    #[tracing::instrument]
     pub fn spawn(&mut self, userdata: T, cmd: &mut Command) -> std::io::Result<()> {
-        let child = cmd
+        let res = cmd
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
-            .spawn()?;
+            .spawn();
 
+        let logres = res.as_ref().map(|child| child.id());
+        tracing::debug!(?logres);
+        let child = res?;
         self.sa.push(ProcessLineStream::new(userdata, child));
         Ok(())
     }
@@ -42,7 +47,7 @@ where
 
 impl<T> Stream for CommandMultiplexer<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     type Item = ChildEvent<T>;
 

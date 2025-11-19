@@ -10,3 +10,4 @@ futures.workspace = true
 pin-project.workspace = true
 tokio = { workspace = true, features = ["process"] }
 tokio-process-stream.workspace = true
+tracing.workspace = true
