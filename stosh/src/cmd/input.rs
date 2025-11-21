@@ -1,17 +1,16 @@
 use crossterm::event::Event::{self, Key};
 use crossterm::event::KeyCode::Enter;
 use crossterm::event::{KeyEvent, KeyModifiers};
-use ratatui::layout::Constraint::{Fill, Length};
-use ratatui::style::{Style, Stylize};
-use ratatui::text::Line;
-use ratatui::widgets::Widget;
+use ratatui::style::Styled as _;
+use ratatui::widgets::{Padding, Widget};
 use ratatui_rseq::Renderable;
 
 use crate::cmd::{Handle, TextArea};
+use crate::cuteblock::CuteBlock;
 use crate::event::ControlMessage;
 use crate::handler::Handler;
 use crate::prompt;
-use crate::u16util::IntoU16 as _;
+use crate::styles::STYLES;
 
 #[derive(Debug)]
 pub(crate) struct Input {
@@ -24,14 +23,23 @@ impl Input {
     pub(crate) fn height(&self) -> usize {
         self.ta.height()
     }
+
+    fn cmd_name(&self) -> &str {
+        self.ta
+            .lines()
+            .iter()
+            .flat_map(|l| l.split(' '))
+            .find(|w| !w.trim().is_empty())
+            .unwrap_or("•")
+    }
 }
 
 impl Default for Input {
     fn default() -> Self {
         Input {
             ta: TextArea::default()
-                .set_cursor_style(Style::default().on_blue())
-                .set_style(Style::default().black().on_gray()),
+                .set_cursor_style(STYLES.text.input)
+                .set_style(STYLES.text.input),
             histix: 0,
         }
     }
@@ -39,15 +47,14 @@ impl Default for Input {
 
 impl Renderable for &Input {
     fn into_widget(self) -> impl Widget {
-        let prompt = Line::from(prompt::text(self.histix).black().on_light_cyan());
-        let pwidth = prompt.width().into_u16();
+        let st = STYLES.text.histix;
 
-        prompt
-            .constrained(Length(pwidth))
-            .on_left()
-            .followed_by(self.ta.constrained(Fill(1)))
-            .horizontal_margin(1)
-            .spacing(1)
+        CuteBlock::bordered()
+            .title_top(prompt::text(self.histix).set_style(st))
+            .title_top(self.cmd_name().set_style(st))
+            .border_style(STYLES.border.input.style)
+            .border_type(STYLES.border.input.btype)
+            .padding(Padding::horizontal(1))
     }
 }
 

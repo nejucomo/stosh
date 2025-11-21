@@ -4,8 +4,10 @@
 //!
 //! Each command run in the user's shell has its own interactive ui widgets, which makes things like comparing two command runs or scrolling/collapsing the output of commands conveniently dynamic.
 #![deny(unsafe_code, missing_docs)]
+#![feature(iter_intersperse)]
 mod cli;
 mod cmd;
+mod cuteblock;
 mod event;
 mod evloop;
 mod exitdialog;
@@ -15,6 +17,7 @@ mod mainscreen;
 mod prompt;
 mod rectext;
 mod run;
+mod styles;
 mod u16util;
 mod ui;
 
