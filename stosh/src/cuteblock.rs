@@ -6,7 +6,6 @@ use ratatui::style::{Style, Styled as _};
 use ratatui::symbols::border::Set;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, BorderType, Borders, Padding, Widget};
-use ratatui_rseq::Renderable;
 
 #[derive(Debug, Default, new)]
 pub struct CuteBlock<'a> {
@@ -111,14 +110,8 @@ impl<'a> From<CuteBlock<'a>> for Block<'a> {
     }
 }
 
-impl<'a> Renderable for CuteBlock<'a> {
-    fn into_widget(self) -> impl Widget {
-        Block::from(self)
-    }
-}
-
 impl<'a> Widget for CuteBlock<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        self.into_widget().render(area, buf)
+        self.into_block().render(area, buf)
     }
 }

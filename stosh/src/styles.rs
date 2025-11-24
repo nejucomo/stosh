@@ -1,11 +1,11 @@
-use ratatui::style::Color::{Black, Cyan, DarkGray, Gray, Green, LightRed, Red, White, Yellow};
+use ratatui::style::Color::{Black, DarkGray, Gray, Green, LightRed, Red, White, Yellow};
 use ratatui::style::Style;
 use ratatui::widgets::BorderType;
 
 pub(crate) const STYLES: Styles = Styles {
     text: TextStyles {
         histix: Style::new().fg(White).bg(Black),
-        input: Style::new().fg(Gray).bg(DarkGray).underline_color(Cyan),
+        input: Style::new().fg(Gray).bg(DarkGray),
         stdout: Style::new().fg(Gray).bg(Black),
         stderr: Style::new().fg(Yellow).bg(Black),
     },

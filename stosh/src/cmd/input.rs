@@ -20,8 +20,10 @@ pub(crate) struct Input {
 
 impl Input {
     /// The height of the CommandInput
+    #[tracing::instrument]
     pub(crate) fn height(&self) -> usize {
-        self.ta.height()
+        let borders = 2;
+        self.ta.height() + borders
     }
 
     fn cmd_name(&self) -> &str {
